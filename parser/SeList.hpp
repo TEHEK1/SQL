@@ -1,0 +1,10 @@
+#pragma once
+#include <vector>
+#include "Operator.hpp"
+#include "Table.hpp"
+class SeList {
+    SeList(std::vector<Operator> columns);
+    std::shared_ptr<Table> execute(std::shared_ptr<Table>);
+private:
+    std::vector<Operator> m_columns;
+};
