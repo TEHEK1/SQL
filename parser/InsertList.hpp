@@ -4,7 +4,7 @@
 #include "UpdateEqualList.hpp"
 
 class InsertList { // Можно отнаследовать два разных, но посыл такой
-    InsertList(std::vector<std::string>&);
+    InsertList(std::vector<Object>&);
     InsertList(const UpdateEqualList&);
     bool execute(Table&);
 };
