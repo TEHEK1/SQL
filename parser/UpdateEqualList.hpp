@@ -5,6 +5,6 @@
 
 class UpdateEqualList {
     UpdateEqualList(const std::vector<UpdateEqual>&);
-    Table execute(const Table&);
+    Table execute(Table&);
 
 };
