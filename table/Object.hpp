@@ -1,5 +1,5 @@
 #pragma once
-#include "ObjectTypes.h"
+#include "ObjectTypes.hpp"
 #include <variant>
 #include <string>
 #include <vector>
@@ -22,6 +22,10 @@ public:
             throw std::runtime_error("Invalid type requested");
         }
     }
+
+    ObjectTypes getType() {
+        return type;
+    }    
 
 private:
     ObjectTypes type;
