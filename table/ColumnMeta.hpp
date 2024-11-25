@@ -9,17 +9,10 @@
 
 class ColumnMeta {
 public:
-    ColumnMeta(long long realColumnNum, ObjectTypes type, std::unordered_set<Attributes> attributes = {}, int lastValue = -1, int sizeValue = 0)
-        : realColumnNum(realColumnNum), type(type), attributes(attributes), lastValue(lastValue), sizeValue(sizeValue) {
-        setDefaultValue(type);
-    }
+    ColumnMeta(long long realColumnNum, ObjectTypes type, std::unordered_set<Attributes> attributes = {}, int lastValue = -1, int sizeValue = 0);
 
     long long getNextIncrement(); // retuns next if int
     bool canInsert(std::shared_ptr<Object> object) const; // Checks can we insert object to this column according to its attributes and type
-    ColumnMeta(long long realColumnNum);
-    ColumnMeta(const ColumnMeta&, long long realColumnNum);
-    long long getNextIncrement(); // retuns next
-    bool canInsert(const Object& object) const; // Checks can we insert object to this column according to its attributes and type
     long long getRealColumnNum() const; // returns saved columnNum;
     bool updateInsert(std::shared_ptr<Object> value); // update Meta information like object is inserted to table in this column
     ObjectTypes getType() const; // returns type

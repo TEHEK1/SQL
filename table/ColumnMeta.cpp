@@ -1,5 +1,11 @@
 #include "ColumnMeta.hpp"
 
+
+ColumnMeta::ColumnMeta(long long realColumnNum, ObjectTypes type, std::unordered_set<Attributes> attributes = {}, int lastValue = -1, int sizeValue = 0)
+    : realColumnNum(realColumnNum), type(type), attributes(attributes), lastValue(lastValue), sizeValue(sizeValue) {
+    setDefaultValue(type);
+}
+
 long long ColumnMeta::getNextIncrement() {
     if(lastValue >= 0) {
         return lastValue + 1;
