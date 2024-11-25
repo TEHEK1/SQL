@@ -3,6 +3,6 @@
 
 class Condition {
 public:
-    virtual Table execute (const Table&) = 0;
+    virtual std::shared_ptr<Table> execute (const std::shared_ptr<Table> &) = 0;
     virtual ~Condition() = 0;
 };

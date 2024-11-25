@@ -5,6 +5,6 @@
 class ConditionObject : Condition {
 public:
     ConditionObject(const Object&);
-    Table execute(const Table &) override;
+    std::shared_ptr<Table> execute(const Table &) override;
     ~ConditionObject() override = default;
 };

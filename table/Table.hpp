@@ -7,7 +7,6 @@
 #include "Row.hpp"
 class Table {
 public:
-
 private:
     //friend class TableFactory;
     std::vector< std::shared_ptr<Row> > rows;
