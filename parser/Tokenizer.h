@@ -36,6 +36,7 @@ enum class TokenType {
     SQL_JOIN,   // JOIN
     SQL_ON,     // ON
     SQL_UPDATE, // UPDATE
+    SQL_TABLE,  // TABLE
     SQL_SET,    // SET
     END         // end of input
 };

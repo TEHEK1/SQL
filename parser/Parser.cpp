@@ -109,6 +109,49 @@ std::shared_ptr<Condition> Parser::parse_condition() const {
     return ret;
 }
 
+struct NamedRow {
+    std::string name, value;
+};
+struct UnnamedRow {
+    std::string value;
+};
+
+std::shared_ptr<InsertTO> Parser::parse_insert_to() {
+    Token cur_token = tokenizer.next();
+    if(cur_token.type != TokenType::IDENTIFIER) {
+        throw std::runtime_error("Expected identifier in TO clause. Expected IDENTIFIER, got " + cur_token.value);
+    }
+    std::vector<NamedRow> namedRows;
+    std::vector<UnnamedRow> unnamedRows;
+    Token next_token = tokenizer.next();
+    if(next_token.type == TokenType::EQUAL) {
+        next_token = tokenizer.next();
+        if(next_token.type != TokenType::IDENTIFIER) {
+            throw std::runtime_error("Expected identifier in ROW statement in insert. Expected IDENTIFIER, got " + next_token.value);
+        }
+        namedRows.push_back({cur_token.value, next_token.value});
+
+        while (tokenizer.preload_next().type == TokenType::COMMA) {
+            tokenizer.next();
+            Token name = tokenizer.next();
+            if(name.type != TokenType::IDENTIFIER) {
+                throw std::runtime_error("Expected identifier while parsing ROW statement in insert. Got " + name.value);
+            }
+            Token equals = tokenizer.next();
+            if(equals.type != TokenType::EQUAL) {
+                throw std::runtime_error("Expected = while parsing ROW statement in insert. Got " + equals.value);
+            }
+            Token value = tokenizer.next();
+            if(value.type != TokenType::IDENTIFIER) {
+                throw std::runtime_error("Expected identifier while parsing ROW statement in insert. Got " + value.value);
+            }
+        }
+    }
+    if(next_token.type == TokenType::COMMA) {
+
+    }
+
+}
 
 
 std::shared_ptr<Query> Parser::parse_query(const std::string& s) {
@@ -117,6 +160,9 @@ std::shared_ptr<Query> Parser::parse_query(const std::string& s) {
         if(next_token.type == TokenType::SQL_SELECT) {
             return std::dynamic_pointer_cast<Query>(parse_sfw());
         }
+        if(next_token.type == TokenType::SQL_DELETE) {
+            return std::dynamic_pointer_cast<Query>(parse_delete());
+        }}
         if(next_token.type == TokenType::SQL_CREATE) {
             return std::dynamic_pointer_cast<Query>(parse_create_table());
         }

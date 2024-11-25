@@ -153,6 +153,7 @@ TokenType Tokenizer::identifyKeyword(const std::string& value) {
     if (value == "FROM") return TokenType::SQL_FROM;
     if (value == "WHERE") return TokenType::SQL_WHERE;
     if (value == "INSERT") return TokenType::SQL_INSERT;
+    if (value == "TABLE") return TokenType::SQL_TABLE;
     if (value == "TO") return TokenType::SQL_TO;
     if (value == "DELETE") return TokenType::SQL_DELETE;
     if (value == "CREATE") return TokenType::SQL_CREATE;

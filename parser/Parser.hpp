@@ -13,8 +13,10 @@ class Parser {
     std::shared_ptr<SeList> parse_selist();
     std::shared_ptr<Relation> parse_relation();
 
+    // Query parsers
+
     std::shared_ptr<SFW> parse_sfw();
-    std::shared_ptr<>
+    std::shared_ptr<InsertTO> parse_insert_to();
 public:
     Parser(Tokenizer &tokenizer);
     std::shared_ptr<Query> parse_query(const std::string &s);
