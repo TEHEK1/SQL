@@ -6,7 +6,8 @@
 class RelationJoin : public Relation{
 public:
     RelationJoin(const std::shared_ptr<Relation>&, const std::shared_ptr<Relation>&, const std::shared_ptr<JoinEqualList>&);
-    std::shared_ptr<Table> execute(const std::shared_ptr<DataBase> &) override;
+    std::shared_ptr<Table> execute(const std::shared_ptr<DataBase> &) const override;
+    std::string getName() const override;
 private:
     std::shared_ptr<Relation> m_relation1;
     std::shared_ptr<Relation> m_relation2;

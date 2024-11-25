@@ -8,6 +8,7 @@
 class ColumnMeta {
 public:
     ColumnMeta(long long realColumnNum);
+    ColumnMeta(const ColumnMeta&, long long realColumnNum);
     long long getNextIncrement(); // retuns next
     bool canInsert(const Object& object) const; // Checks can we insert object to this column according to its attributes and type
     long long getRealColumnNum() const; // returns saved columnNum;

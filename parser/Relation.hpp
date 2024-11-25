@@ -5,6 +5,7 @@
 
 class Relation {
 public:
-    virtual std::shared_ptr<Table> execute(const std::shared_ptr<DataBase>&) = 0;
+    virtual std::shared_ptr<Table> execute(const std::shared_ptr<DataBase>&) const = 0;
+    virtual std::string getName() const = 0;
     virtual ~Relation() = default;
 };
