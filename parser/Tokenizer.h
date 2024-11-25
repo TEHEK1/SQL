@@ -5,6 +5,7 @@
 
 enum class TokenType {
     IDENTIFIER, // [a-zA-Z_][a-zA-Z0-9_]*
+    COMMA,      // ,
     STRING,     // ".*"
     NUMBER,     // [0-9]+
     PLUS,       // +
@@ -47,7 +48,7 @@ struct Token {
 class Tokenizer {
 public:
     explicit Tokenizer(const std::string& str);
-
+    Token preload_next();
     Token next();
 
 private:

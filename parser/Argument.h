@@ -2,6 +2,7 @@
 #include <any>
 #include <string>
 #include <vector>
+#include <SeList.hpp>
 
 class Relation {
     Relation(const std::string &s);
@@ -12,7 +13,7 @@ class Query {
 public:
     virtual ~Query() = default;
 
-private:
+protected:
     Query();
     virtual Relation execute() = 0;
 };
@@ -23,10 +24,6 @@ class Attribute {
 };
 
 
-class SeList {
-    SeList(const std::vector<Attribute> &attributes);
-};
-
 class Condition {
 
 };
@@ -35,12 +32,12 @@ class RelationList {
     RelationList(const std::vector<Relation> &relations);
 };
 
-class SFW : Query { //SFW = Select ... from .. where
+class SFW : public Query { //SFW = Select ... from .. where
     SFW(const SeList& se_list, const RelationList& from_list, const Condition& condition):Query() {};
     Relation execute() override;
 };
 
-class JoinOn : Query {
+class JoinOn : public Query {
     JoinOn(const Relation &r1, const Relation &r2, const Condition &condition):Query() {};
     Relation execute() override;
 };

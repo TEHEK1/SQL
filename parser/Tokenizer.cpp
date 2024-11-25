@@ -5,6 +5,13 @@
 
 Tokenizer::Tokenizer(const std::string& str) : input(str), pos(0) {}
 
+Token Tokenizer::preload_next() {
+    size_t cur_pos = pos;
+    Token t = next();
+    pos = cur_pos;
+    return t;
+}
+
 Token Tokenizer::next() {
     skipWhitespace();
     if (pos >= input.length()) {
@@ -76,6 +83,9 @@ Token Tokenizer::next() {
     } else if (c == ')') {
         pos++;
         return Token{TokenType::RPAREN, ")"};
+    } else if (c == ',') {
+        pos++;
+        return Token{TokenType::COMMA, ","};
     }
 
     // String literals
