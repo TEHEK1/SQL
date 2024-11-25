@@ -7,6 +7,9 @@
 #include "Row.hpp"
 class Table {
 public:
+    [[nodiscard]] std::vector<std::shared_ptr<Row> >  getRows() const &&;
+
+    [[nodiscard]] const std::vector<std::shared_ptr<Row> > & getRows() const &;
 private:
     //friend class TableFactory;
     std::vector< std::shared_ptr<Row> > rows;

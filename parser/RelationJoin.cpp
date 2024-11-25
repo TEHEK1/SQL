@@ -7,5 +7,8 @@ RelationJoin::RelationJoin(const std::shared_ptr<Relation> & relation1, const st
 std::shared_ptr<Table> RelationJoin::execute(const std::shared_ptr<DataBase> & dataBase) {
     auto table1 = m_relation1->execute(dataBase);
     auto table2 = m_relation2->execute(dataBase);
-    for()
+    auto resultTable = std::make_shared<Table>();
+    for(const auto& row1:table1->getRows()) {
+        
+    }
 }
