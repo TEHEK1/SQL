@@ -13,4 +13,5 @@ target_include_directories(sql PUBLIC
         ${CMAKE_SOURCE_DIR}/parser
         ${CMAKE_SOURCE_DIR}/parser/conditions
         ${CMAKE_SOURCE_DIR}/parser/operators
+        ${CMAKE_SOURCE_DIR}/parser/query
         ${CMAKE_SOURCE_DIR}/table)

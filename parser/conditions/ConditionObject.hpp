@@ -2,9 +2,9 @@
 #include "Condition.hpp"
 #include "Object.hpp"
 
-class ConditionObject : Condition {
+class ConditionObject : public Condition {
 public:
-    ConditionObject(const Object&);
-    std::shared_ptr<Table> execute(const Table &) override;
+    ConditionObject(const std::shared_ptr<Object>&);
+    virtual std::shared_ptr<Table> execute (const std::shared_ptr<Table> &) const override;
     ~ConditionObject() override = default;
 };
