@@ -4,6 +4,6 @@
 
 class Query {
 public:
-    bool execute (const std::shared_ptr<DataBase>&) const;
+    virtual bool execute (const std::shared_ptr<DataBase>&) const = 0;
     virtual ~Query();
 };

@@ -4,8 +4,8 @@
 #include "Table.hpp"
 class SeList {
 public:
-    SeList(std::vector<std::shared_ptr<Operator> > columns);
-    std::shared_ptr<Table> execute(std::shared_ptr<Table>);
+    explicit SeList(const std::vector<std::shared_ptr<Operator> >& columns);
+    std::shared_ptr<Table> execute(const std::shared_ptr<Table>&);
 private:
-    std::vector<Operator> m_columns;
+    std::vector<std::shared_ptr<Operator> > m_columns;
 };

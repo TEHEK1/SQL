@@ -8,7 +8,7 @@ std::shared_ptr<Table> JoinEqualList::execute(const std::string &tableName1, con
     {
         size_t offset = 0;
         for(const auto& [tableMeta, tableName]:{std::pair{table1->getTableMeta(), tableName1}, std::pair{table2->getTableMeta(), tableName2}}){
-            for(const auto& [name, columnMeta] : tableMeta.getColumnMetas()) {
+            for(const auto& [name, columnMeta] : tableMeta.getNameColumnMetas()) {
                 resultTableMeta.setByName(tableName + "." + name, std::make_shared<ColumnMeta>(*columnMeta, columnMeta->getRealColumnNum() + offset));
             }
             offset += tableMeta.size();
