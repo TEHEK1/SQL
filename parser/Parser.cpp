@@ -153,6 +153,17 @@ std::shared_ptr<InsertTO> Parser::parse_insert_to() {
 
 }
 
+std::shared_ptr<DeleteFrom> Parser::parse_delete() {
+    std::shared_ptr<Relation> relation = parse_relation();
+    Token next_token = tokenizer.next();
+    if(next_token.type != TokenType::SQL_WHERE) {
+        throw std::runtime_error("Expected WHERE in DELETE statement. Expected WHERE, got " + next_token.value);
+    }
+    std::shared_ptr<Condition> where = parse_condition();
+    return std::make_shared<DeleteFrom>(*relation, *where);
+}
+
+
 
 std::shared_ptr<Query> Parser::parse_query(const std::string& s) {
     Token next_token = tokenizer.next();
