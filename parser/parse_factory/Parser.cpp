@@ -301,7 +301,6 @@ std::shared_ptr<Query> Parser::parse_create_table() {
     while(true) {
         next_token = tokenizer.next();
         std::shared_ptr<AttributesSet> attributes = parse_attributes();
-        next_token = tokenizer.next();
         if(next_token.type != TokenType::IDENTIFIER) {
             throw std::runtime_error("Expected identifier in CREATE statement. Expected IDENTIFIER, got " + next_token.value);
         }
