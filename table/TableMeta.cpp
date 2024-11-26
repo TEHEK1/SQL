@@ -21,6 +21,7 @@ bool TableMeta::setByName(const std::string& name, const std::shared_ptr<ColumnM
     m_stringColumnMetas[name] = inforrmation;
     m_longColumnMetas[inforrmation -> getRealColumnNum()] = inforrmation;
     m_stringToLongColumnMetas[name] = inforrmation -> getRealColumnNum();
+    return true;
 }
 
 size_t TableMeta::size() const {

@@ -1,17 +1,17 @@
 #include "ColumnMeta.hpp"
 #include <stdexcept>
 
-ColumnMeta::ColumnMeta(long long realColumnNum, ObjectTypes type, std::unordered_set<Attributes> attributes = {}, int lastValue = -1, int sizeValue = 0)
+ColumnMeta::ColumnMeta(long long realColumnNum, ObjectTypes type, std::unordered_set<Attributes> attributes, int lastValue, int sizeValue, std::shared_ptr<Object> defaultValue)
     : realColumnNum(realColumnNum), type(type), attributes(attributes), lastValue(lastValue), sizeValue(sizeValue) {
-    setDefaultValue(type);
+    setDefaultValue(defaultValue);
 }
 
 ColumnMeta::ColumnMeta(const ColumnMeta& other, long long realColumnNum)
     : realColumnNum(realColumnNum), type(other.type), attributes(other.attributes), lastValue(other.lastValue), sizeValue(other.sizeValue) {
-    setDefaultValue(other.type);
+    setDefaultValue(other.defaultValue);
 }
 
-std::shared_ptr<Object> ColumnMeta::getNextIncrement() {
+std::shared_ptr<Object> ColumnMeta::getNextIncrement() const {
     if(type != ObjectTypes::INT32) {
         throw std::runtime_error("wrong type in getNextIncrement");
     }
@@ -85,25 +85,22 @@ std::shared_ptr<UnorderedIndex> ColumnMeta::getUnorderedIndex() const {
 }
 
 std::shared_ptr<Object> ColumnMeta::getDefaultValue() const {
-    return std::make_shared<Object>(defaultValue);
+    return defaultValue;
 }
 
-void ColumnMeta::setDefaultValue(ObjectTypes objectTypes) {
-    using variant = std::variant<int32_t, bool, std::string, std::vector<bool>>;
-    switch (objectTypes)
-    {
-    case ObjectTypes::BOOL :
-        defaultValue = Object(ObjectTypes::INT32,variant ((bool)false));
-        break;
-    case ObjectTypes::BYTES :
-        defaultValue = Object(ObjectTypes::INT32,variant ((std::vector<bool>)std::vector<bool>(sizeValue)));
-        break;
-    case ObjectTypes::INT32 :
-        defaultValue = Object(ObjectTypes::INT32,variant ((int32_t)0));
-        break;
-    case ObjectTypes::STRING :
-        std::string spaces(sizeValue, ' ');
-        defaultValue = Object(ObjectTypes::STRING,variant(spaces));
-        break;
+bool ColumnMeta::hasAutoIncrement() const {
+    if(!(type == ObjectTypes::INT32)) {
+        return false;
+    }
+    return true;
+}
+
+bool ColumnMeta::hasDefaultValue() const {
+    return defaultValue != nullptr;
+}
+
+void ColumnMeta::setDefaultValue(std::shared_ptr<Object> object) {
+    if(object != 0) {
+    defaultValue = std::move(object);
     }
 }

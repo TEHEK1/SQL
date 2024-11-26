@@ -1,5 +1,7 @@
 #pragma once
 #include "ColumnMeta.hpp"
+#include <unordered_map>
+
 class TableMeta {
 public:
     std::shared_ptr<ColumnMeta> getByName(const std::string&) const; // 

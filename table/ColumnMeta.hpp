@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 #include "Index.hpp"
 #include "Object.hpp"
 #include "OrderedIndex.hpp"
@@ -9,7 +8,7 @@
 
 class ColumnMeta {
 public:
-    ColumnMeta(long long realColumnNum, ObjectTypes type, std::unordered_set<Attributes> attributes = {}, int lastValue = -1, int sizeValue = 0);
+    ColumnMeta(long long realColumnNum, ObjectTypes type, std::unordered_set<Attributes> attributes = {}, int lastValue = -1, int sizeValue = 0, std::shared_ptr<Object> defaultValue = 0);
     ColumnMeta(const ColumnMeta&, long long realColumnNum);
     std::shared_ptr<Object> getNextIncrement() const; // retuns next if int
 
@@ -28,7 +27,7 @@ private:
     bool updateInsert(std::shared_ptr<Object> value, std::shared_ptr<Row>); // update Meta information like object is inserted to table in this column
     bool updateDelete(const std::shared_ptr<Object>& value); // update Meta information like object is inserted to table in this column
     bool updateUpdate(std::shared_ptr<Object> value, std::shared_ptr<Object> object, std::shared_ptr<Row>); // update Meta information like object is inserted to table in this column
-    void setDefaultValue(ObjectTypes objectTypes);
+    void setDefaultValue(std::shared_ptr<Object> object);
     std::shared_ptr<Object> updateNextIncrement(); // retuns next if int
     std::unordered_set<Attributes> attributes;
     long long lastValue = -1; // if the object type is not a number then store -1
@@ -36,6 +35,6 @@ private:
     std::shared_ptr<OrderedIndex> ordered;
     std::shared_ptr<UnorderedIndex> unordered;
     long long realColumnNum;
-    Object defaultValue;
+    std::shared_ptr<Object> defaultValue = 0;
     long long sizeValue = 0;
 };

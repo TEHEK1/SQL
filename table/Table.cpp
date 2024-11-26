@@ -13,3 +13,8 @@
 TableMeta Table::getTableMeta() const {
     return columnMetas;
 }
+
+bool Table::insertRow(const std::shared_ptr<Row>& row) { 
+    rows.push_back(row);
+    return true;
+}

@@ -7,7 +7,8 @@
 class Object {
 public:
     Object(ObjectTypes type, std::variant<int32_t, bool, std::string, std::vector<bool>> value) : type(type), value(value) {}
-    
+    Object(const Object &other) : type(other.type), value(other.value) {};
+
     template <typename T>
     Object(ObjectTypes type, T value) : type(type), value(value) {}
     

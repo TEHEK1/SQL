@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "Object.hpp"
+#include <memory>
 
 class Row {
     public:
