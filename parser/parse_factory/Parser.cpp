@@ -3,12 +3,15 @@
 #include <iostream>
 #include <ostream>
 
+#include "Table.hpp"
 #include "Tokenizer.h"
 #include "SeList.hpp"
 #include "OperatorIdentifier.hpp"
 #include "RelationTable.hpp"
-#include "parse_factory/MathParser.h"
-
+#include "MathParser.h"
+#include "RelationJoin.hpp"
+#include "InsertList.hpp"
+#include "InsertTo.hpp"
 
 Parser::Parser(Tokenizer &tokenizer) : tokenizer(tokenizer) {}
 
@@ -33,10 +36,10 @@ std::shared_ptr<SeList> Parser::parse_selist() {
 }
 
 std::shared_ptr<JoinEqualList> Parser::parse_join_equal_list() {
-    std::vector<JoinEqual> jeList = {};
+    std::vector<std::shared_ptr<JoinEqual>> jeList = {};
     while(true) {
         std::shared_ptr<JoinEqual> join_equal = parse_join_equal();
-        jeList.push_back(*join_equal);
+        jeList.push_back(join_equal);
         Token next_token = tokenizer.preload_next();
         if (next_token.type != TokenType::COMMA) {
             return std::make_shared<JoinEqualList>(jeList);
@@ -94,7 +97,7 @@ std::shared_ptr<SFW> Parser::parse_sfw() {
         throw std::runtime_error("Expected WHERE in SELECT statement. Expected WHERE, got " + next_token.value);
     }
     std::shared_ptr<Condition> where = parse_condition();
-    return std::make_shared<SFW>(*select_list, *relation, *where);
+    return std::make_shared<SFW>(select_list, relation, where);
 }
 
 std::shared_ptr<Condition> Parser::parse_condition() const {
@@ -116,7 +119,7 @@ struct UnnamedRow {
     std::string value;
 };
 
-std::shared_ptr<InsertTO> Parser::parse_insert_to() {
+std::shared_ptr<InsertTo> Parser::parse_insert_to() {
     Token cur_token = tokenizer.next();
     if(cur_token.type != TokenType::IDENTIFIER) {
         throw std::runtime_error("Expected identifier in TO clause. Expected IDENTIFIER, got " + cur_token.value);
@@ -160,7 +163,7 @@ std::shared_ptr<DeleteFrom> Parser::parse_delete() {
         throw std::runtime_error("Expected WHERE in DELETE statement. Expected WHERE, got " + next_token.value);
     }
     std::shared_ptr<Condition> where = parse_condition();
-    return std::make_shared<DeleteFrom>(*relation, *where);
+    return std::make_shared<DeleteFrom>(relation, where);
 }
 
 
@@ -180,4 +183,6 @@ std::shared_ptr<Query> Parser::parse_query(const std::string& s) {
         next_token = tokenizer.next();
     }
 }
+
+std::shared_ptr<>
 
