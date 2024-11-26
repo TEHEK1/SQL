@@ -1,5 +1,7 @@
 #include "TableFactory.hpp"
 #include "RowFactory.hpp"
+#include "ObjectFactory.hpp"
+
 std::shared_ptr<Table> TableFactory::joinTables(const std::shared_ptr<Table>& table1,  const std::string& tableName1,
                                                 const std::shared_ptr<Table>& table2,  const std::string& tableName2,
                                                 const std::vector<std::shared_ptr<JoinEqual>>& joinEquals) {
@@ -76,4 +78,17 @@ bool TableFactory::deleteByCondition(const std::shared_ptr<Table>& table, const 
         }
     }
     return true;
+}
+
+std::shared_ptr<Table> TableFactory::filter_equal(const std::string& name, 
+        const std::shared_ptr<Object>& equal_object, const std::shared_ptr<Table>& table) {
+    
+    std::shared_ptr<Table> resultTableMeta = std::make_shared<Table>(table -> getTableMeta());
+    for(const auto& row:table -> getRows()) {
+        std::shared_ptr<Object> v = ObjectFactory::getObjectByColumnName(name, row, table -> columnMetas);
+        if(v == equal_object) {
+            resultTableMeta -> insertRow(row);
+        }
+    }
+    return resultTableMeta;
 }
