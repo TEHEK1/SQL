@@ -4,7 +4,8 @@
 class RelationTable : public Relation {
 public:
     explicit RelationTable(const std::string &);
-    [[nodiscard]] std::shared_ptr<Table> execute(const std::shared_ptr<DataBase> &) const override;
+    std::shared_ptr<Table> getTableRelation(const std::shared_ptr<DataBase> &) const override;
+    std::string getName() const override;
 private:
     std::string m_tableName;
 };

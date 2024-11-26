@@ -4,6 +4,6 @@
 class OperatorPlus : public Operator{
 public:
     OperatorPlus(const Operator& operator1, const Operator& operator2);
-    Object execute(const Row&, const ColumnMeta&) override;
+    Object getObjectOperator(const Row&, const ColumnMeta&) override;
     ~OperatorPlus() override = default;
 };

@@ -20,17 +20,24 @@ target_include_directories(sql PUBLIC
         ${CMAKE_SOURCE_DIR}/table)
 
 
+file(GLOB TESTS ${CMAKE_SOURCE_DIR}/tests/*.*)
 
-#include(GoogleTest)
-#add_executable(FooTest FooUnitTest.cxx)
-#gtest_add_tests(TARGET      FooTest
-#        TEST_SUFFIX .noArgs
-#        TEST_LIST   noArgsTests
-#)
-#gtest_add_tests(TARGET      FooTest
-#        EXTRA_ARGS  --someArg someValue
-#        TEST_SUFFIX .withArgs
-#        TEST_LIST   withArgsTests
-#)
+
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        # Specify the commit you depend on and update it regularly.
+        URL https://github.com/google/googletest/archive/5376968f6948923e2411081fd9372e71a59d8e77.zip)
+FetchContent_MakeAvailable(googletest)
+
+add_executable(unit_test ${TESTS})
+target_link_libraries(unit_test gtest_main)
+
+target_include_directories(unit_test PRIVATE ${gtest_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/parser
+        ${CMAKE_SOURCE_DIR}/parser/conditions
+        ${CMAKE_SOURCE_DIR}/parser/operators
+        ${CMAKE_SOURCE_DIR}/parser/query
+        ${CMAKE_SOURCE_DIR}/table)
+add_test(NAME unit_test COMMAND unit_test)
 #set_tests_properties(${noArgsTests}   PROPERTIES TIMEOUT 10)
 #set_tests_properties(${withArgsTests} PROPERTIES TIMEOUT 20)

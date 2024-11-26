@@ -5,7 +5,7 @@
 class SeList {
 public:
     explicit SeList(const std::vector<std::shared_ptr<Operator> >& columns);
-    std::shared_ptr<Table> execute(const std::shared_ptr<Table>&);
+    std::shared_ptr<Table> getTable(const std::shared_ptr<Table>&);
 private:
     std::vector<std::shared_ptr<Operator> > m_columns;
 };

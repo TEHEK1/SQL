@@ -4,6 +4,8 @@
 class OperatorIdentifier : public Operator {
 public:
     OperatorIdentifier(const std::string&);
-    Object execute(const Row&, const ColumnMeta&) override;
+    std::shared_ptr<Object> getObjectOperator(const std::shared_ptr<Row>&, const TableMeta&) const override;
     ~OperatorIdentifier() override = default;
+private:
+    std::string m_columnName;
 };

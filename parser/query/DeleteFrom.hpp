@@ -6,7 +6,7 @@
 class DeleteFrom : public Query {
 public:
     DeleteFrom(const std::shared_ptr<Relation> &, const std::shared_ptr<Condition> &);
-    bool execute(const std::shared_ptr<DataBase> &) const override;
+    bool executeQuery(const std::shared_ptr<DataBase> &) const override;
 private:
     std::shared_ptr<Relation> m_relation;
     std::shared_ptr<Condition> m_condition;

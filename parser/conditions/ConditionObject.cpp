@@ -9,12 +9,16 @@ ConditionObject::ConditionObject(const std::shared_ptr<Object> & object) : m_obj
     }
 }
 
-std::shared_ptr<Table> ConditionObject::execute(const std::shared_ptr<Table> & table) const {
+std::shared_ptr<Table> ConditionObject::getTableCondition(const std::shared_ptr<Table> & table) const {
     if(m_object->getValue<bool>()) {
         return table;
     }
     else {
         return std::make_shared<Table>(table->getTableMeta());
     }
+}
+
+std::shared_ptr<Object> ConditionObject::getObjectOperator(const std::shared_ptr<Row> &, const TableMeta &) const {
+    return m_object;
 }
 

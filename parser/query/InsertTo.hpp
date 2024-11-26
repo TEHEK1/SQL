@@ -5,5 +5,5 @@
 
 class InsertTo : public Query{
 public:
-    bool execute(const std::shared_ptr<DataBase> &) const override = 0;
+    bool executeQuery(const std::shared_ptr<DataBase> &) const override = 0;
 };

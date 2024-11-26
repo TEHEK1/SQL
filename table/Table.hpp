@@ -16,9 +16,7 @@ public:
      TableMeta getTableMeta() const;
      bool insertRow(const std::shared_ptr<Row>& );
 private:
-    friend class DeleteFrom;
-    friend class UpdateFrom;
-    //friend class TableFactory;
+    friend class TableFactory;
     std::vector< std::shared_ptr<Row> > rows;
     TableMeta columnMetas;
 };
