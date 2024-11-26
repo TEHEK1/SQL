@@ -13,7 +13,7 @@
 #include "InsertToOperatorList.hpp"
 #include "InsertToUpdateList.hpp"
 #include "InsertTo.hpp"
-
+#include "CreateTable.hpp"
 #include "Attributes.hpp"
 
 Parser::Parser(const Tokenizer &tokenizer) : tokenizer(tokenizer) {}
@@ -264,6 +264,7 @@ std::shared_ptr<Query> Parser::parse_query(const std::string& s) {
         }
         next_token = tokenizer.next();
     }
+    throw std::runtime_error("Unrecognized command");
 }
 
 static ObjectTypes matchTokenToType(const Token& token) {
@@ -362,6 +363,6 @@ std::shared_ptr<Query> Parser::parse_create_table() {
     if(next_token.type != TokenType::RPAREN) {
         throw std::runtime_error("Expected ) in CREATE statement. Expected ), got " + next_token.value);
     }
-
+    return std::dynamic_pointer_cast<Query>(std::make_shared<CreateTable>(table_name, table_meta));
 }
 
