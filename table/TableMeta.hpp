@@ -10,6 +10,8 @@ public:
     
     TableMeta(const TableMeta &other);
 
+    TableMeta() = default;
+
     std::shared_ptr<ColumnMeta> getByName(const std::string&) const; // 
     std::shared_ptr<ColumnMeta> getByNumber(long long) const;
     bool setByName(const std::string&, const std::shared_ptr<ColumnMeta>&);
