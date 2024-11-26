@@ -7,83 +7,57 @@ std::shared_ptr<Object> OperatorMath::getObjectOperator(const std::shared_ptr<Ro
     auto object1 = m_operator1->getObjectOperator(row, tableMeta);
     auto object2 = m_operator2->getObjectOperator(row, tableMeta);
     switch (m_tokenType) {
-
-        case TokenType::IDENTIFIER:
-            break;
-        case TokenType::COMMA:
-            break;
-        case TokenType::STRING:
-            break;
-        case TokenType::BYTES:
-            break;
-        case TokenType::NUMBER:
-            break;
         case TokenType::PLUS:
+            if(object1->getType() == ObjectTypes::INT32 && object2->getType() == ObjectTypes::INT32) {
+                return std::make_shared<Object>(ObjectTypes::INT32, object1->getValue<int32_t>() + object2->getValue<int32_t>());
+            }
+            else if(object1->getType() == ObjectTypes::STRING && object2->getType() == ObjectTypes::STRING) {
+                return std::make_shared<Object>(ObjectTypes::STRING, object1->getValue<std::string>() + object2->getValue<std::string>());
+            }
+            else {
+                throw std::runtime_error("+ accepts only string and int32");
+            }
             break;
         case TokenType::MINUS:
+            if(object1->getType() == ObjectTypes::INT32 && object2->getType() == ObjectTypes::INT32) {
+                return std::make_shared<Object>(ObjectTypes::INT32, object1->getValue<int32_t>() - object2->getValue<int32_t>());
+            }
+            else {
+                throw std::runtime_error("- accepts only int32");
+            }
             break;
         case TokenType::STAR:
+            if(object1->getType() == ObjectTypes::INT32 && object2->getType() == ObjectTypes::INT32) {
+                return std::make_shared<Object>(ObjectTypes::INT32, object1->getValue<int32_t>() * object2->getValue<int32_t>());
+            }
+            else {
+                throw std::runtime_error("* accepts only int32");
+            }
             break;
         case TokenType::SLASH:
+            if(object1->getType() == ObjectTypes::INT32 && object2->getType() == ObjectTypes::INT32) {
+                if(object2->getValue<int32_t>() == 0) {
+                    throw std::runtime_error("/ accepts only not null right operand");
+                }
+                return std::make_shared<Object>(ObjectTypes::INT32, object1->getValue<int32_t>() / object2->getValue<int32_t>());
+            }
+            else {
+                throw std::runtime_error("/ accepts only int32");
+            }
             break;
         case TokenType::MOD:
+            if(object1->getType() == ObjectTypes::INT32 && object2->getType() == ObjectTypes::INT32) {
+                if(object2->getValue<int32_t>() == 0) {
+                    throw std::runtime_error("% accepts only not null right operand");
+                }
+                return std::make_shared<Object>(ObjectTypes::INT32, object1->getValue<int32_t>() % object2->getValue<int32_t>());
+            }
+            else {
+                throw std::runtime_error("% accepts only int32");
+            }
             break;
-        case TokenType::LEN:
-            break;
-        case TokenType::EQUAL:
-            break;
-        case TokenType::NEQUAL:
-            break;
-        case TokenType::LESS:
-            break;
-        case TokenType::GREATER:
-            break;
-        case TokenType::LEQUAL:
-            break;
-        case TokenType::GEQUAL:
-            break;
-        case TokenType::AND:
-            break;
-        case TokenType::OR:
-            break;
-        case TokenType::NOT:
-            break;
-        case TokenType::LPAREN:
-            break;
-        case TokenType::RPAREN:
-            break;
-        case TokenType::XOR:
-            break;
-        case TokenType::TRUE:
-            break;
-        case TokenType::FALSE:
-            break;
-        case TokenType::SQL_SELECT:
-            break;
-        case TokenType::SQL_FROM:
-            break;
-        case TokenType::SQL_WHERE:
-            break;
-        case TokenType::SQL_INSERT:
-            break;
-        case TokenType::SQL_TO:
-            break;
-        case TokenType::SQL_DELETE:
-            break;
-        case TokenType::SQL_CREATE:
-            break;
-        case TokenType::SQL_JOIN:
-            break;
-        case TokenType::SQL_ON:
-            break;
-        case TokenType::SQL_UPDATE:
-            break;
-        case TokenType::SQL_TABLE:
-            break;
-        case TokenType::SQL_SET:
-            break;
-        case TokenType::END:
-            break;
+        default:
+            throw std::runtime_error("Math operator got not math token");
     }
     return object1;
 }
