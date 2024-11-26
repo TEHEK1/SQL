@@ -10,8 +10,10 @@
 #include "RelationTable.hpp"
 #include "MathParser.h"
 #include "RelationJoin.hpp"
-#include "InsertList.hpp"
+#include "InsertToOperatorList.hpp"
+#include "InsertToUpdateList.hpp"
 #include "InsertTo.hpp"
+
 #include "Attributes.hpp"
 
 Parser::Parser(Tokenizer &tokenizer) : tokenizer(tokenizer) {}
@@ -120,20 +122,37 @@ struct UnnamedRow {
     std::string value;
 };
 
+static std::shared_ptr<OperatorObject> operatorObjectByToken(const Token &token) {
+    if (token.type == TokenType::TRUE) {
+        return std::make_shared<OperatorObject>(std::make_shared<Object>(ObjectTypes::BOOL, true));
+    }
+    if (token.type == TokenType::FALSE) {
+        return std::make_shared<OperatorObject>(std::make_shared<Object>(ObjectTypes::BOOL, false));
+    }
+    if (token.type == TokenType::NUMBER) {
+        int value = std::stoi(token.value);
+        return std::make_shared<OperatorObject>(std::make_shared<Object>(ObjectTypes::INT32, value));
+    }
+    if (token.type == TokenType::STRING) {
+        return std::make_shared<OperatorObject>(std::make_shared<Object>(ObjectTypes::STRING, token.value));
+    }
+    throw std::runtime_error("Unexpected token in insert statement. Got " + token.value);
+}
+
+
 std::shared_ptr<InsertTo> Parser::parse_insert_to() {
     Token cur_token = tokenizer.next();
     if(cur_token.type != TokenType::IDENTIFIER) {
         throw std::runtime_error("Expected identifier in TO clause. Expected IDENTIFIER, got " + cur_token.value);
     }
-    std::vector<NamedRow> namedRows;
-    std::vector<UnnamedRow> unnamedRows;
+
     Token next_token = tokenizer.next();
+    UpdateList update_list;
+    TableFactory::InsertOperatorList operatorList;
     if(next_token.type == TokenType::EQUAL) {
+
         next_token = tokenizer.next();
-        if(next_token.type != TokenType::IDENTIFIER) {
-            throw std::runtime_error("Expected identifier in ROW statement in insert. Expected IDENTIFIER, got " + next_token.value);
-        }
-        namedRows.push_back({cur_token.value, next_token.value});
+        update_list.emplace_back(cur_token.value, operatorObjectByToken(next_token));
 
         while (tokenizer.preload_next().type == TokenType::COMMA) {
             tokenizer.next();
@@ -146,15 +165,39 @@ std::shared_ptr<InsertTo> Parser::parse_insert_to() {
                 throw std::runtime_error("Expected = while parsing ROW statement in insert. Got " + equals.value);
             }
             Token value = tokenizer.next();
-            if(value.type != TokenType::IDENTIFIER) {
-                throw std::runtime_error("Expected identifier while parsing ROW statement in insert. Got " + value.value);
+            if(value.type != TokenType::STRING && value.type != TokenType::NUMBER && value.type != TokenType::TRUE && value.type != TokenType::FALSE) {
+                throw std::runtime_error("Expected value while parsing ROW statement in insert. Got " + value.value);
             }
+            update_list.emplace_back(name.value, operatorObjectByToken(value));
         }
     }
     if(next_token.type == TokenType::COMMA) {
 
+        long long column_num = 0;
+        while(true) {
+            next_token = tokenizer.next();
+            if(next_token.type == TokenType::COMMA) {
+                ++column_num;
+                continue;
+            }
+            operatorList[column_num] = operatorObjectByToken(next_token);
+            next_token = tokenizer.next();
+            if(next_token.type != TokenType::COMMA) {
+                break;
+            }
+            column_num++;
+        }
     }
-
+    next_token = tokenizer.next();
+    if(next_token.type != TokenType::SQL_TO) {
+        throw std::runtime_error("Expected TO in INSERT statement. Expected TO, got " + next_token.value);
+    }
+    next_token = tokenizer.next();
+    std::shared_ptr<Relation> relation = parse_relation();
+    if(!update_list.empty()) {
+        return std::dynamic_pointer_cast<InsertTo>(std::make_shared<InsertToUpdateList>(update_list, relation));
+    }
+    return std::dynamic_pointer_cast<InsertTo>(std::make_shared<InsertToOperatorList>(operatorList, relation));
 }
 
 std::shared_ptr<DeleteFrom> Parser::parse_delete() {
@@ -212,9 +255,12 @@ std::shared_ptr<Query> Parser::parse_query(const std::string& s) {
         }
         if(next_token.type == TokenType::SQL_DELETE) {
             return std::dynamic_pointer_cast<Query>(parse_delete());
-        }}
+        }
         if(next_token.type == TokenType::SQL_CREATE) {
             return std::dynamic_pointer_cast<Query>(parse_create_table());
+        }
+        if(next_token.type == TokenType::SQL_INSERT) {
+            return std::dynamic_pointer_cast<Query>(parse_insert_to());
         }
         next_token = tokenizer.next();
     }

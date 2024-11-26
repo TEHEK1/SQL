@@ -9,6 +9,7 @@
 #include "DataBase.hpp"
 #include "Tokenizer.h"
 #include "Condition.hpp"
+#include "InsertTo.hpp"
 
 
 class Parser {
@@ -24,7 +25,7 @@ class Parser {
     std::shared_ptr<DeleteFrom> parse_delete();
     std::shared_ptr<Query> parse_create_table();
     std::shared_ptr<SFW> parse_sfw();
-    std::shared_ptr<InsertTO> parse_insert_to();
+    std::shared_ptr<InsertTo> parse_insert_to();
 public:
     Parser(Tokenizer &tokenizer);
     std::shared_ptr<Query> parse_query(const std::string &s);
