@@ -18,3 +18,5 @@ bool Table::insertRow(const std::shared_ptr<Row>& row) {
     rows.push_back(row);
     return true;
 }
+
+Table::Table(const TableMeta& meta) : columnMetas(meta){}

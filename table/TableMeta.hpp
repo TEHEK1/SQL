@@ -4,6 +4,12 @@
 
 class TableMeta {
 public:
+    TableMeta(std::unordered_map<std::string, long long > &, 
+        std::unordered_map<std::string, std::shared_ptr<ColumnMeta> > &, 
+            std::unordered_map<long long, std::shared_ptr<ColumnMeta> > &);
+    
+    TableMeta(const TableMeta &other);
+
     std::shared_ptr<ColumnMeta> getByName(const std::string&) const; // 
     std::shared_ptr<ColumnMeta> getByNumber(long long) const;
     bool setByName(const std::string&, const std::shared_ptr<ColumnMeta>&);
