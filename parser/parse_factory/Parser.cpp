@@ -12,6 +12,7 @@
 #include "RelationJoin.hpp"
 #include "InsertList.hpp"
 #include "InsertTo.hpp"
+#include "Attributes.hpp"
 
 Parser::Parser(Tokenizer &tokenizer) : tokenizer(tokenizer) {}
 
@@ -166,7 +167,42 @@ std::shared_ptr<DeleteFrom> Parser::parse_delete() {
     return std::make_shared<DeleteFrom>(relation, where);
 }
 
+static Attributes matchTokenToAttribute(const Token& token) {
+    if(token.type == TokenType::SQL_KEY) {
+        return Attributes::KEY;
+    }
+    if(token.type == TokenType::SQL_UNIQUE) {
+        return Attributes::UNIQUE;
+    }
+    if(token.type == TokenType::SQL_AUTOINCREMENT) {
+        return Attributes::AUTOINCREMENT;
+    }
+    throw std::runtime_error("Unexpected token in attributes list. Got " + token.value);
+}
 
+std::shared_ptr<AttributesSet> Parser::parse_attributes() {
+    Token next_token = tokenizer.preload_next();
+    if(next_token.type != TokenType::LFIGURE) {
+        return {};
+    }
+    tokenizer.next();
+    AttributesSet attributes;
+    while(true) {
+        next_token = tokenizer.next();
+        if(next_token.type != TokenType::IDENTIFIER) {
+            throw std::runtime_error("Expected identifier in attributes list. Expected IDENTIFIER, got " + next_token.value);
+        }
+        attributes.insert(matchTokenToAttribute(next_token));
+        next_token = tokenizer.next();
+        if(next_token.type == TokenType::RFIGURE) {
+            break;
+        }
+        if(next_token.type != TokenType::COMMA) {
+            throw std::runtime_error("Expected comma or RFIGURE in attributes list. Expected COMMA or RFIGURE, got " + next_token.value);
+        }
+    }
+    return std::make_shared<AttributesSet>(attributes);
+}
 
 std::shared_ptr<Query> Parser::parse_query(const std::string& s) {
     Token next_token = tokenizer.next();
@@ -184,5 +220,103 @@ std::shared_ptr<Query> Parser::parse_query(const std::string& s) {
     }
 }
 
-std::shared_ptr<>
+static ObjectTypes matchTokenToType(const Token& token) {
+    if(token.type == TokenType::STRING_TYPE) {
+        return ObjectTypes::STRING;
+    }
+    if(token.type == TokenType::INT32_TYPE) {
+        return ObjectTypes::INT32;
+    }
+    if(token.type == TokenType::BOOL_TYPE) {
+        return ObjectTypes::BOOL;
+    }
+    if(token.type == TokenType::BYTES_TYPE) {
+        return ObjectTypes::BYTES;
+    }
+    throw std::runtime_error("Unexpected token in attributes list. Got " + token.value);
+}
+
+std::shared_ptr<Query> Parser::parse_create_table() {
+    Token next_token = tokenizer.next();
+    if(next_token.type != TokenType::SQL_TABLE) {
+        throw std::runtime_error("Expected TABLE in CREATE statement. Expected TABLE, got " + next_token.value);
+    }
+    next_token = tokenizer.next();
+    if(next_token.type != TokenType::IDENTIFIER) {
+        throw std::runtime_error("Expected identifier in CREATE statement. Expected IDENTIFIER, got " + next_token.value);
+    }
+    std::string table_name = next_token.value;
+    next_token = tokenizer.next();
+    if(next_token.type != TokenType::LPAREN) {
+        throw std::runtime_error("Expected ( in CREATE statement. Expected (, got " + next_token.value);
+    }
+    TableMeta table_meta;
+    long long column_num = 0;
+    while(true) {
+        next_token = tokenizer.next();
+        std::shared_ptr<AttributesSet> attributes = parse_attributes();
+        next_token = tokenizer.next();
+        if(next_token.type != TokenType::IDENTIFIER) {
+            throw std::runtime_error("Expected identifier in CREATE statement. Expected IDENTIFIER, got " + next_token.value);
+        }
+        std::string column_name = next_token.value;
+        next_token = tokenizer.next();
+        if(next_token.type != TokenType::COLON) {
+            throw std::runtime_error("Expected : in CREATE statement. Expected :, got " + next_token.value);
+        }
+        next_token = tokenizer.next();
+        ObjectTypes type = matchTokenToType(next_token);
+        next_token = tokenizer.next();
+        int size = 0;
+        if(type == ObjectTypes::STRING || type == ObjectTypes::BYTES) {
+            if(next_token.type != TokenType::LBRACKET) {
+                throw std::runtime_error("Expected [ in CREATE statement. Expected [, got " + next_token.value);
+            }
+            next_token = tokenizer.next();
+            if(next_token.type != TokenType::NUMBER) {
+                throw std::runtime_error("Expected number in CREATE statement. Expected NUMBER, got " + next_token.value);
+            }
+            size = std::stoi(next_token.value);
+            next_token = tokenizer.next();
+            if(next_token.type != TokenType::RBRACKET) {
+                throw std::runtime_error("Expected ] in CREATE statement. Expected ], got " + next_token.value);
+            }
+        }
+        next_token = tokenizer.preload_next();
+        std::shared_ptr<Object> defaultValue = nullptr;
+        if(next_token.type == TokenType::EQUAL) {
+            tokenizer.next();
+            next_token = tokenizer.next();
+            if(next_token.type == TokenType::TRUE) {
+                defaultValue = std::make_shared<Object>(ObjectTypes::BOOL, true);
+            }
+            if(next_token.type == TokenType::FALSE) {
+                defaultValue = std::make_shared<Object>(ObjectTypes::BOOL, false);
+            }
+            if(next_token.type == TokenType::NUMBER) {
+                int value = std::stoi(next_token.value);
+                defaultValue = std::make_shared<Object>(ObjectTypes::INT32, value);
+            }
+            if(next_token.type == TokenType::STRING) {
+                defaultValue = std::make_shared<Object>(ObjectTypes::STRING, next_token.value);
+            }
+            if (defaultValue == nullptr) {
+                throw std::runtime_error("Unexpected token in CREATE statement. Got " + next_token.value);
+            }
+            if (defaultValue -> getType() != type) {
+                throw std::runtime_error("Type mismatch in CREATE statement. Default value type does not match column type");
+            }
+        }
+        std::shared_ptr<ColumnMeta> column_meta = std::make_shared<ColumnMeta>(column_num, type, *attributes, 0, size, defaultValue);
+        table_meta.setByName(column_name, column_meta);
+        next_token = tokenizer.next();
+        if(next_token.type != TokenType::COMMA) {
+            break;
+        }
+    }
+    if(next_token.type != TokenType::RPAREN) {
+        throw std::runtime_error("Expected ) in CREATE statement. Expected ), got " + next_token.value);
+    }
+
+}
 

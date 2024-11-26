@@ -18,9 +18,11 @@ class Parser {
     std::shared_ptr<Condition> parse_condition() const;
     std::shared_ptr<SeList> parse_selist();
     std::shared_ptr<Relation> parse_relation();
+    std::shared_ptr<AttributesSet> parse_attributes();
 
     // Query parsers
     std::shared_ptr<DeleteFrom> parse_delete();
+    std::shared_ptr<Query> parse_create_table();
     std::shared_ptr<SFW> parse_sfw();
     std::shared_ptr<InsertTO> parse_insert_to();
 public:

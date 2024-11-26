@@ -59,6 +59,9 @@ Token Tokenizer::next() {
     } else if (c == '*') {
         pos++;
         return Token{TokenType::STAR, "*"};
+    } else if (c == ':') {
+        pos++;
+        return Token{TokenType::COLON, ":"};
     } else if (c == '/') {
         pos++;
         return Token{TokenType::SLASH, "/"};
@@ -80,6 +83,17 @@ Token Tokenizer::next() {
     } else if (c == '(') {
         pos++;
         return Token{TokenType::LPAREN, "("};
+    } else if (c == '[') {
+        pos++;
+        return Token{TokenType::LBRACKET, "["};
+    } else if (c == '{') {
+        pos++;
+        return Token{TokenType::LFIGURE, "{"};
+    } else if (c == '}') {
+        ++pos;
+        return Token{TokenType::RFIGURE, "}"};
+    } else if (c == ']') {
+        return Token{TokenType::RBRACKET, "]"};
     } else if (c == ')') {
         pos++;
         return Token{TokenType::RPAREN, ")"};
@@ -154,6 +168,15 @@ TokenType Tokenizer::identifyKeyword(const std::string& value) {
     if (value == "WHERE") return TokenType::SQL_WHERE;
     if (value == "INSERT") return TokenType::SQL_INSERT;
     if (value == "TABLE") return TokenType::SQL_TABLE;
+    if (value == "KEY") return TokenType::SQL_KEY;
+    if (value == "UNIQUE") return TokenType::SQL_UNIQUE;
+    if (value == "AUTOINCREMENT") return TokenType::SQL_AUTOINCREMENT;
+    if (value == "true") return TokenType::TRUE;
+    if (value == "false") return TokenType::FALSE;
+    if(value == "string") return TokenType::STRING_TYPE;
+    if(value == "int32") return TokenType::INT32_TYPE;
+    if(value == "bool") return TokenType::BOOL_TYPE;
+    if(value == "bytes") return TokenType::BYTES_TYPE;
     if (value == "TO") return TokenType::SQL_TO;
     if (value == "DELETE") return TokenType::SQL_DELETE;
     if (value == "CREATE") return TokenType::SQL_CREATE;

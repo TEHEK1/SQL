@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 
 enum class Attributes{
@@ -5,6 +6,7 @@ enum class Attributes{
     AUTOINCREMENT,  
     KEY
 };
+typedef std::unordered_set<Attributes> AttributesSet;
 
 namespace std {
     template <>

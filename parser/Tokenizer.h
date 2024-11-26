@@ -26,6 +26,18 @@ enum class TokenType {
     NOT,        // !
     LPAREN,     // (
     RPAREN,     // )
+    LFIGURE,    // {
+    RFIGURE,    // }
+    LBRACKET,   // [
+    RBRACKET,   // ]
+    COLON,      // :
+    STRING_TYPE, // string
+    INT32_TYPE, // int32
+    BOOL_TYPE,  // bool
+    BYTES_TYPE, // bytes
+    SQL_KEY,    // KEY
+    SQL_UNIQUE, // UNIQUE
+    SQL_AUTOINCREMENT, // AUTOINCREMENT
     XOR,        // ^^
     TRUE,       // true
     FALSE,      // false

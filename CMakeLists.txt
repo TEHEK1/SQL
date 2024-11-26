@@ -8,10 +8,11 @@ file(GLOB PARSER ${CMAKE_SOURCE_DIR}/parser/*.*)
 file(GLOB PARSER_CONDITIONS ${CMAKE_SOURCE_DIR}/parser/conditions/*.*)
 file(GLOB PARSER_OPERATORS ${CMAKE_SOURCE_DIR}/parser/operators/*.*)
 file(GLOB PARSER_QUERY ${CMAKE_SOURCE_DIR}/parser/query/*.*)
+file(GLOB PARSE_FACTORY ${CMAKE_SOURCE_DIR}/parser/parse_factory/*.*)
 
 file(GLOB TABLE ${CMAKE_SOURCE_DIR}/table/*.*)
 
-add_executable(sql main.cpp ${PARSER_CONDITIONS} ${PARSER_OPERATORS} ${PARSER_QUERY} ${TABLE} )
+add_executable(sql main.cpp ${PARSER_CONDITIONS} ${PARSER_OPERATORS} ${PARSE_FACTORY} ${PARSER_QUERY} ${TABLE} )
 target_include_directories(sql PUBLIC
         ${CMAKE_SOURCE_DIR}/parser
         ${CMAKE_SOURCE_DIR}/parser/conditions
