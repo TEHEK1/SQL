@@ -85,26 +85,42 @@ std::shared_ptr<Expression> MathParser::parseTerm() {
 }
 
 std::shared_ptr<Expression> MathParser::parseFactor() {
+    // if (currentToken.type == TokenType::LEN) {  // Унарный оператор LEN
+    //     currentToken = tokenizer.next();
+    //     auto operand = parseFactor();  // Разбираем операнд для LEN
+    //     return std::make_shared<Expression>(std::make_shared<OperatorObject>(std::make_shared<Object>(ObjectTypes::INT32, (operand->get<std::shared_ptr<Object>>()->getValue<std::string>()).size())));
+    // }
+    //
+    // if (currentToken.type == TokenType::NOT) {  // Унарный оператор NOT
+    //     currentToken = tokenizer.next();
+    //     auto operand = parseFactor();  // Разбираем операнд для NOT
+    //     return std::make_shared<Expression>(std::make_shared<OperatorObject>(std::make_shared<Object>(ObjectTypes::BOOL, !operand->get<std::shared_ptr<Object>>()->getBool())));
+    // }
+
     if (currentToken.type == TokenType::NUMBER) {
         int value = std::stoi(currentToken.value);
         currentToken = tokenizer.next();
         return std::make_shared<Expression>(std::make_shared<OperatorObject>(std::make_shared<Object>(ObjectTypes::INT32, value)));
     }
+
     if (currentToken.type == TokenType::STRING) {
         std::string value = currentToken.value;
         currentToken = tokenizer.next();
         return std::make_shared<Expression>(std::make_shared<OperatorIdentifier>(value));
     }
+
     if (currentToken.type == TokenType::TRUE || currentToken.type == TokenType::FALSE) {
         bool value = currentToken.type == TokenType::TRUE;
         currentToken = tokenizer.next();
         return std::make_shared<Expression>(std::dynamic_pointer_cast<Condition>(std::make_shared<ConditionObject>(std::make_shared<Object>(ObjectTypes::BOOL, value))));
     }
+
     if (currentToken.type == TokenType::IDENTIFIER) {
         std::string identifier = currentToken.value;
         currentToken = tokenizer.next();
         return std::make_shared<Expression>(identifier);
     }
+
     if (currentToken.type == TokenType::LPAREN) {
         currentToken = tokenizer.next();
         auto expr = parseExpression();
@@ -114,5 +130,6 @@ std::shared_ptr<Expression> MathParser::parseFactor() {
         currentToken = tokenizer.next();
         return expr;
     }
+
     throw std::runtime_error("Unexpected token.");
 }

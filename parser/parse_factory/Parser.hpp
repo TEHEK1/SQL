@@ -27,6 +27,6 @@ class Parser {
     std::shared_ptr<SFW> parse_sfw();
     std::shared_ptr<InsertTo> parse_insert_to();
 public:
-    Parser(Tokenizer &tokenizer);
+    Parser(const Tokenizer &tokenizer);
     std::shared_ptr<Query> parse_query(const std::string &s);
 };

@@ -1,5 +1,4 @@
-#ifndef MATHPARSER_HPP
-#define MATHPARSER_HPP
+#pragma once
 
 #include <memory>
 #include <string>
@@ -42,4 +41,3 @@ private:
     Token currentToken;
 };
 
-#endif // MATHPARSER_HPP

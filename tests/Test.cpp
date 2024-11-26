@@ -6,6 +6,8 @@
 #include "OperatorIdentifier.hpp"
 #include "OperatorObject.hpp"
 #include "RelationTable.hpp"
+#include "Tokenizer.h"
+#include "parse_factory/Parser.hpp"
 // Dummy test
 // Define a test case named 'ExampleTest' and a test named 'test'
 TEST(SFW, elementarySFW)
@@ -22,7 +24,20 @@ TEST(SFW, elementarySFW)
                                                           std::make_shared<ConditionObject>(std::make_shared<Object>(ObjectTypes::BOOL, true)));
     query->executeQuery(dataBase);
 
-EXPECT_EQ(true, true);
+    EXPECT_EQ(true, true);
+}
+
+TEST(SFW, stringSFW) {
+    std::string user_query = "SELECT id FROM student WHERE true";
+    auto dataBase = std::make_shared<DataBase> ();
+    auto tableMeta = TableMeta();
+    tableMeta.setByName("id", std::make_shared<ColumnMeta>(0, ObjectTypes::BOOL));
+    auto table = std::make_shared<Table> (tableMeta);
+    dataBase->insertTable("student", table);
+    TableFactory::insertRow({{0, std::make_shared<OperatorObject>(std::make_shared<Object>())}}, table);
+    auto query = Parser(Tokenizer(user_query)).parse_query(user_query);
+    bool res = query->executeQuery(dataBase);
+    EXPECT_EQ(res, true);
 }
 
 int main(int argc, char **argv) {
