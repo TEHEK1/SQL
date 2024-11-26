@@ -10,6 +10,8 @@ public:
     Object(const Object &other) : type(other.type), value(other.value) {};
 
     bool operator==(const Object& other) const;
+    bool operator<(const Object& other) const;
+    bool operator>(const Object& other) const;
 
     template <typename T>
     Object(ObjectTypes type, T value) : type(type), value(value) {}
