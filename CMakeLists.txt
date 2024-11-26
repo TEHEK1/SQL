@@ -11,7 +11,7 @@ file(GLOB PARSER_QUERY ${CMAKE_SOURCE_DIR}/parser/query/*.*)
 
 file(GLOB TABLE ${CMAKE_SOURCE_DIR}/table/*.*)
 
-add_executable(sql main.cpp ${PARSER} ${TABLE} )
+add_executable(sql main.cpp ${PARSER_CONDITIONS} ${PARSER_OPERATORS} ${PARSER_QUERY} ${TABLE} )
 target_include_directories(sql PUBLIC
         ${CMAKE_SOURCE_DIR}/parser
         ${CMAKE_SOURCE_DIR}/parser/conditions
@@ -30,7 +30,7 @@ FetchContent_Declare(
         URL https://github.com/google/googletest/archive/5376968f6948923e2411081fd9372e71a59d8e77.zip)
 FetchContent_MakeAvailable(googletest)
 
-add_executable(unit_test ${TESTS})
+add_executable(unit_test ${TESTS} ${PARSER_CONDITIONS} ${PARSER_OPERATORS} ${PARSER_QUERY} ${TABLE})
 target_link_libraries(unit_test gtest_main)
 
 target_include_directories(unit_test PRIVATE ${gtest_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/parser

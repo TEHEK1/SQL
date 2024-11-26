@@ -15,7 +15,8 @@ public:
     [[nodiscard]] const std::vector<std::shared_ptr<Row> > & getRows() const &;
      TableMeta getTableMeta() const;
 private:
-    bool insertRow(const std::shared_ptr<Row>& ); // надо дописать обновление табле меты
+    bool insertRow(const std::shared_ptr<Row>& );
+    friend class Condition;
     friend class TableFactory;
     std::vector< std::shared_ptr<Row> > rows;
     TableMeta columnMetas;

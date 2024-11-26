@@ -15,7 +15,7 @@ TEST(SFW, elementarySFW)
     tableMeta.setByName("id", std::make_shared<ColumnMeta>(0, ObjectTypes::BOOL));
     auto table = std::make_shared<Table> (tableMeta);
     dataBase->insertTable("student", table);
-    TableFactory::insertRow({std::make_shared<OperatorObject>(std::make_shared<Object>())});
+    TableFactory::insertRow({{0, std::make_shared<OperatorObject>(std::make_shared<Object>())}}, table);
     std::shared_ptr<Query> query =  std::make_shared<SFW>(std::make_shared<SeList>(
             std::vector{std::dynamic_pointer_cast<Operator>(std::make_shared<OperatorIdentifier>("id"))}),
                                                           std::make_shared<RelationTable>("student"),
