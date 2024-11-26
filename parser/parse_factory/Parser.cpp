@@ -142,15 +142,15 @@ static std::shared_ptr<OperatorObject> operatorObjectByToken(const Token &token)
 
 std::shared_ptr<InsertTo> Parser::parse_insert_to() {
     Token cur_token = tokenizer.next();
-    if(cur_token.type != TokenType::IDENTIFIER) {
-        throw std::runtime_error("Expected identifier in TO clause. Expected IDENTIFIER, got " + cur_token.value);
+    if(cur_token.type != TokenType::LPAREN) {
+        throw std::runtime_error("Expected identifier in TO clause. Expected (, got " + cur_token.value);
     }
-
-    Token next_token = tokenizer.next();
+    cur_token = tokenizer.next();
+    Token next_token = tokenizer.preload_next();
     UpdateList update_list;
     TableFactory::InsertOperatorList operatorList;
     if(next_token.type == TokenType::EQUAL) {
-
+        tokenizer.next();
         next_token = tokenizer.next();
         update_list.emplace_back(cur_token.value, operatorObjectByToken(next_token));
 
@@ -171,14 +171,19 @@ std::shared_ptr<InsertTo> Parser::parse_insert_to() {
             update_list.emplace_back(name.value, operatorObjectByToken(value));
         }
     }
-    if(next_token.type == TokenType::COMMA) {
+    else if(next_token.type == TokenType::COMMA || next_token.type == TokenType::RPAREN) {
 
         long long column_num = 0;
+        operatorList[column_num] = operatorObjectByToken(cur_token);
+        ++column_num;
         while(true) {
             next_token = tokenizer.next();
             if(next_token.type == TokenType::COMMA) {
                 ++column_num;
                 continue;
+            }
+            if(next_token.type == TokenType::RPAREN) {
+                break;
             }
             operatorList[column_num] = operatorObjectByToken(next_token);
             next_token = tokenizer.next();
@@ -188,11 +193,13 @@ std::shared_ptr<InsertTo> Parser::parse_insert_to() {
             column_num++;
         }
     }
+    else {
+        throw std::runtime_error("Cannot parse insert List");
+    }
     next_token = tokenizer.next();
     if(next_token.type != TokenType::SQL_TO) {
         throw std::runtime_error("Expected TO in INSERT statement. Expected TO, got " + next_token.value);
     }
-    next_token = tokenizer.next();
     std::shared_ptr<Relation> relation = parse_relation();
     if(!update_list.empty()) {
         return std::dynamic_pointer_cast<InsertTo>(std::make_shared<InsertToUpdateList>(update_list, relation));
@@ -226,7 +233,7 @@ static Attributes matchTokenToAttribute(const Token& token) {
 std::shared_ptr<AttributesSet> Parser::parse_attributes() {
     Token next_token = tokenizer.preload_next();
     if(next_token.type != TokenType::LFIGURE) {
-        return {};
+        return std::make_shared<AttributesSet>();
     }
     tokenizer.next();
     AttributesSet attributes;
@@ -312,9 +319,10 @@ std::shared_ptr<Query> Parser::parse_create_table() {
         }
         next_token = tokenizer.next();
         ObjectTypes type = matchTokenToType(next_token);
-        next_token = tokenizer.next();
+
         int size = 0;
         if(type == ObjectTypes::STRING || type == ObjectTypes::BYTES) {
+            next_token = tokenizer.next();
             if(next_token.type != TokenType::LBRACKET) {
                 throw std::runtime_error("Expected [ in CREATE statement. Expected [, got " + next_token.value);
             }
@@ -355,11 +363,11 @@ std::shared_ptr<Query> Parser::parse_create_table() {
         }
         std::shared_ptr<ColumnMeta> column_meta = std::make_shared<ColumnMeta>(column_num, type, *attributes, 0, size, defaultValue);
         table_meta.setByName(column_name, column_meta);
-        next_token = tokenizer.next();
         if(next_token.type != TokenType::COMMA) {
             break;
         }
     }
+    next_token = tokenizer.next();
     if(next_token.type != TokenType::RPAREN) {
         throw std::runtime_error("Expected ) in CREATE statement. Expected ), got " + next_token.value);
     }

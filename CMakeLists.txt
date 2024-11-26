@@ -33,8 +33,10 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(unit_test ${TESTS} ${PARSER} ${PARSE_FACTORY} ${PARSER_CONDITIONS} ${PARSER_OPERATORS} ${PARSER_QUERY} ${TABLE})
 target_link_libraries(unit_test gtest_main)
-#target_compile_options(unit_test PUBLIC -fsanitize=address
-#        -fsanitize=undefined)
+target_compile_options(unit_test PUBLIC
+        #-fsanitize=address
+        #-fsanitize-memory-track-origins=2
+)
 
 target_include_directories(unit_test PRIVATE ${gtest_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/parser
         ${CMAKE_SOURCE_DIR}/parser/conditions

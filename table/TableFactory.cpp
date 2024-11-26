@@ -63,15 +63,15 @@ bool TableFactory::insertRow(InsertOperatorList insertOperatorList, const std::s
 bool TableFactory::deleteByCondition(const std::shared_ptr<Table>& table, const std::shared_ptr<Condition>& condition) {
     auto& rows = table->rows ;
     for(auto rowIterator = rows.begin(); rowIterator != rows.end(); ) {
-        auto isCondition = condition->getObjectOperator(*rowIterator, table->getTableMeta())->getValue<bool>();
-        bool canBeDeleted = true;
-        for(const auto& [columnNum, columnMeta] : table->getTableMeta().getLongColumnMetas()) {
-            canBeDeleted = canBeDeleted && columnMeta->canDelete((*rowIterator)->getField(columnNum));
+        if(!condition->getObjectOperator(*rowIterator, table->getTableMeta())->getValue<bool>()) {
+            rowIterator ++;
         }
-        if(!canBeDeleted) {
-            return false; // TODO:Here can be exception
-        }
-        if(isCondition && canBeDeleted) {
+        else {
+            for (const auto &[columnNum, columnMeta]: table->getTableMeta().getLongColumnMetas()) {
+                if (!columnMeta->canDelete((*rowIterator)->getField(columnNum))) {
+                    return false;
+                }
+            }
             for(const auto& [columnNum, columnMeta] : table->getTableMeta().getLongColumnMetas()) {
                 columnMeta->updateDelete((*rowIterator)->getField(columnNum));
             }

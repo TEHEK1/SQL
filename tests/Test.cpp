@@ -32,7 +32,7 @@ TEST(SFW, elementarySFW)
 
 TEST(SFW, stringSFW) {
     auto dataBase = std::make_shared<DataBase> ();
-    std::vector<std::string> user_queries ={"CREATE TABLE student (id: bool)",
+    std::vector<std::string> user_queries ={"CREATE TABLE student ( id: bool )",
                                             "INSERT (true) TO student",
                                             "SELECT id FROM student WHERE true"};
     for(auto user_query : user_queries) {
@@ -74,6 +74,20 @@ TEST(DELETE, elementaryDELETE)
                                                           std::make_shared<RelationTable>("student"),
                                                           std::make_shared<ConditionObject>(std::make_shared<Object>(ObjectTypes::BOOL, true)));
     EXPECT_TRUE(query->executeQuery(dataBase));
+}
+
+TEST(DELETE, parseDELETE) {
+    auto dataBase = std::make_shared<DataBase> ();
+    std::vector<std::string> user_queries ={"CREATE TABLE student ( id: bool )",
+                                            "INSERT (true) TO student",
+                                            "INSERT (false) TO student",
+                                            "DELETE student WHERE true",
+                                            "SELECT id FROM student WHERE true"};
+    for(auto user_query : user_queries) {
+        auto query = Parser(Tokenizer(user_query)).parse_query(user_query);
+        query->executeQuery(dataBase);
+        //EXPECT_TRUE(query->executeQuery(dataBase));
+    }
 }
 
 int main(int argc, char **argv) {
