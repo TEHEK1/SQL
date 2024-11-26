@@ -1,4 +1,32 @@
 #include "TableFactory.hpp"
+#include "RowFactory.hpp"
+std::shared_ptr<Table> TableFactory::joinTables(const std::shared_ptr<Table>& table1,  const std::string& tableName1,
+                                                const std::shared_ptr<Table>& table2,  const std::string& tableName2,
+                                                const std::vector<std::shared_ptr<JoinEqual>>& joinEquals) {
+    TableMeta resultTableMeta;
+    {
+        size_t offset = 0;
+        for(const auto& [tableMeta, tableName]:{std::pair{table1->getTableMeta(), tableName1}, std::pair{table2->getTableMeta(), tableName2}}){
+            for(const auto& [name, columnMeta] : tableMeta.getNameColumnMetas()) {
+                auto realColumnName = tableName;
+                realColumnName += ".";
+                realColumnName += name;
+                resultTableMeta.setByName(realColumnName, std::make_shared<ColumnMeta>(*columnMeta, columnMeta->getRealColumnNum() + offset));
+            }
+            offset += tableMeta.size();
+        }
+    }
+    auto result = std::make_shared<Table>(resultTableMeta);
+    auto joinEqual = joinEquals[0];
+    for(const auto& row1:table1->getRows()) {
+        auto filtered = joinEqual->execute(row1, table1->getTableMeta(), table2);
+        for(const auto& row2:filtered->getRows()) {
+            auto current_row = RowFactory::concatenateRow(row1, row2);
+            result->insertRow(current_row);
+        }
+    }
+}
+
 bool TableFactory::insertRow(InsertOperatorList insertOperatorList, const std::shared_ptr<Table> & table) {
     auto tableMeta = table->getTableMeta();
     std::vector<std::shared_ptr<Object> > objects;

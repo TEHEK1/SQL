@@ -11,7 +11,7 @@ file(GLOB PARSER_QUERY ${CMAKE_SOURCE_DIR}/parser/query/*.*)
 
 file(GLOB TABLE ${CMAKE_SOURCE_DIR}/table/*.*)
 
-add_executable(sql main.cpp ${PARSER} ${PARSER_CONDITIONS} ${PARSER_OPERATORS} ${PARSER_QUERY} ${TABLE} )
+add_executable(sql main.cpp ${PARSER} ${TABLE} )
 target_include_directories(sql PUBLIC
         ${CMAKE_SOURCE_DIR}/parser
         ${CMAKE_SOURCE_DIR}/parser/conditions
