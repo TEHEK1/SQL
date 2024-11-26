@@ -94,6 +94,7 @@ bool TableFactory::updateByUpdateList(const std::shared_ptr<Table>& table, Table
             row->fields[columnMeta->getRealColumnNum()] = operatorValue->getObjectOperator(row, tableMeta);
         }
     }
+    return true;
 }
 
 std::shared_ptr<Table> TableFactory::filter_equal(const std::string& name,

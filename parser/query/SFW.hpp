@@ -11,7 +11,7 @@ public:
      std::shared_ptr<Table> getTableRelation(const std::shared_ptr<DataBase> &) const override;
      bool executeQuery (const std::shared_ptr<DataBase>&) const override;
      std::string getName() const override;
-    ~SFW() = default;
+    ~SFW() override = default;
 private:
     std::shared_ptr<SeList> m_seList;
     std::shared_ptr<Relation> m_relation;

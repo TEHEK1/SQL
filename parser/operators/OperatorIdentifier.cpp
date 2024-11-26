@@ -6,4 +6,8 @@ std::shared_ptr<Object> OperatorIdentifier::getObjectOperator(const std::shared_
     return ObjectFactory::getObjectByColumnName(m_columnName, row, tableMeta);
 }
 
+ObjectTypes OperatorIdentifier::getTypeOperator(const TableMeta &tableMeta) const {
+    return tableMeta.getByName(m_columnName)->getType();
+}
+
 

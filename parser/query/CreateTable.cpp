@@ -4,4 +4,5 @@ CreateTable::CreateTable(const std::string & tableName, const TableMeta & tableM
 
 bool CreateTable::executeQuery(const std::shared_ptr<DataBase> & dataBase) const {
     dataBase->insertTable(m_tableName, std::make_shared<Table>(m_tableMeta));
+    return true;
 }

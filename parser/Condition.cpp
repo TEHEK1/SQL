@@ -10,3 +10,7 @@ std::shared_ptr<Table> Condition::getTableConditionLinear(const std::shared_ptr<
     }
     return result;
 }
+
+ObjectTypes Condition::getTypeOperator(const TableMeta &) const {
+    return ObjectTypes::BOOL;
+}

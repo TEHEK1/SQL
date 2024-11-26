@@ -13,7 +13,8 @@ std::shared_ptr<Table> SFW::getTableRelation(const std::shared_ptr<DataBase> & d
 }
 
 bool SFW::executeQuery(const std::shared_ptr<DataBase> & dataBase) const {
-    for(const auto& row : getTableRelation(dataBase)->getRows()) {
+    const auto table = getTableRelation(dataBase);
+    for(const auto& row : table->getRows()) {
         for(auto column : row->getFields()) {
             switch (column->getType()) {
                 case ObjectTypes::INT32:
@@ -32,4 +33,8 @@ bool SFW::executeQuery(const std::shared_ptr<DataBase> & dataBase) const {
             std::cout << std::endl;
         }
     }
+    std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
+    return true;
 }

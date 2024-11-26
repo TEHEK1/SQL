@@ -7,4 +7,5 @@ class ConditionMath : public Condition {
 public:
     ConditionMath(const std::shared_ptr<Condition> &, const std::shared_ptr<Condition> &, TokenType);
     ConditionMath(const std::shared_ptr<Operator> &, const std::shared_ptr<Operator> &, TokenType);
+    ~ConditionMath() override =default;
 };

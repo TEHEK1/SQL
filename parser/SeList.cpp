@@ -9,8 +9,8 @@ std::shared_ptr<Table> SeList::getTable(const std::shared_ptr<Table> & table) {
     {
         long long current_column_num = 0;
         for (const auto& column: m_columns) {
-            resultTableMeta.setByName("", std::make_shared<ColumnMeta>(current_column_num, column->getObjectOperator(
-                    std::shared_ptr<Row>(), table->getTableMeta())->getType()));
+            resultTableMeta.setByName("", std::make_shared<ColumnMeta>(current_column_num, column->getTypeOperator(
+                    table->getTableMeta())));
             current_column_num++;
         }
     }
@@ -22,7 +22,7 @@ std::shared_ptr<Table> SeList::getTable(const std::shared_ptr<Table> & table) {
         for (const auto& column: m_columns) {
             newRow.push_back(column->getObjectOperator(row, table->getTableMeta()));
         }
-        table->insertRow(std::make_shared<Row>(newRow));
+        result->insertRow(std::make_shared<Row>(newRow));
     }
 
     return result;
