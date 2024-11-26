@@ -7,6 +7,7 @@ enum class TokenType {
     IDENTIFIER, // [a-zA-Z_][a-zA-Z0-9_]*
     COMMA,      // ,
     STRING,     // ".*"
+    BYTES,      // 0x.*
     NUMBER,     // [0-9]+
     PLUS,       // +
     MINUS,      // -
@@ -26,6 +27,8 @@ enum class TokenType {
     LPAREN,     // (
     RPAREN,     // )
     XOR,        // ^^
+    TRUE,       // true
+    FALSE,      // false
     SQL_SELECT, // SELECT
     SQL_FROM,   // FROM
     SQL_WHERE,  // WHERE

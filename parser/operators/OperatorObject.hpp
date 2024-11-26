@@ -1,7 +1,7 @@
 #pragma once
 #include "Operator.hpp"
-class OperatorObject : Operator {
-    OperatorObject(const Object&);
-    Object getObjectOperator(const Row&, const ColumnMeta&) override;
+class OperatorObject : public Operator {
+    OperatorObject(const std::shared_ptr<Object>&);
+    Object execute(const Row&, const ColumnMeta&) override;
     ~OperatorObject() override = default;
 };

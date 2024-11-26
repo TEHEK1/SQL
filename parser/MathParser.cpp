@@ -1,223 +1,128 @@
-#pragma once
 #include <memory>
-#include <string>
-#include <vector>
+#include <Object.hpp>
+#include <ObjectTypes.hpp>
 #include <stdexcept>
+#include <variant>
+#include <string>
+#include <unordered_map>
+
+#include "Condition.hpp"
+#include "ConditionMath.hpp"
+#include "ConditionObject.hpp"
+#include "Operator.hpp"
+#include "OperatorIdentifier.hpp"
+#include "OperatorMath.hpp"
+#include "OperatorObject.hpp"
 #include "Tokenizer.h"
 
-// Базовый класс для всех узлов выражений
-class Expr {
-public:
-    virtual ~Expr() = default;
+struct Expression {
+    std::shared_ptr<Condition> my_condition = nullptr;
+    std::shared_ptr<Operator> my_operator = nullptr;
+    explicit Expression(const std::shared_ptr<Condition> &_my_condition) : my_condition(_my_condition) {};
+    explicit Expression(const std::shared_ptr<Operator> &_my_operator) : my_operator(_my_operator) {};
+    explicit Expression(const std::string &identifier) :
+        my_condition(std::make_shared<ConditionObject>(std::make_shared<Object>(ObjectTypes::BOOL, identifier == "true"))),
+        my_operator(std::make_shared<OperatorIdentifier>(identifier))
+    {};
+    template<class T> T get() {
+        if constexpr (std::is_same_v<T, std::shared_ptr<Condition>>) {
+            return my_condition;
+        } else if constexpr (std::is_same_v<T, std::shared_ptr<Operator>>) {
+            return my_operator;
+        }
+        throw std::runtime_error("Unexpected type. in Expression getter");
+    }
 };
 
-// Узел бинарного выражения
-class BinaryExpr : public Expr {
-public:
-    BinaryExpr(std::shared_ptr<Expr> left, Token op, std::shared_ptr<Expr> right)
-        : left(std::move(left)), op(op), right(std::move(right)) {}
-
-    std::shared_ptr<Expr> left;
-    Token op;
-    std::shared_ptr<Expr> right;
-};
-
-// Узел унарного выражения
-class UnaryExpr : public Expr {
-public:
-    UnaryExpr(Token op, std::shared_ptr<Expr> right)
-        : op(op), right(std::move(right)) {}
-
-    Token op;
-    std::shared_ptr<Expr> right;
-};
-
-// Узел литерала (числа, строки)
-class LiteralExpr : public Expr {
-public:
-    LiteralExpr(Token value) : value(value) {}
-
-    Token value;
-};
-
-// Узел переменной (идентификатора)
-class VariableExpr : public Expr {
-public:
-    VariableExpr(Token name) : name(name) {}
-
-    Token name;
-};
-
-// Класс парсера
 class MathParser {
 public:
-    explicit MathParser(Tokenizer tokenizer);
+    explicit MathParser(Tokenizer tokenizer) : tokenizer(std::move(tokenizer)) {
+        currentToken = this->tokenizer.next();
+    }
 
-    // Начало парсинга выражения
-    std::shared_ptr<Expr> parse();
+    std::shared_ptr<Condition> parse() {
+        auto condition = parseCondition();
+        if (currentToken.type != TokenType::END) {
+            throw std::runtime_error("Unexpected token after condition.");
+        }
+        return condition;
+    }
 
 private:
-    // Функции парсинга
-    std::shared_ptr<Expr> expression();
-    std::shared_ptr<Expr> logical_or();
-    std::shared_ptr<Expr> logical_and();
-    std::shared_ptr<Expr> equality();
-    std::shared_ptr<Expr> comparison();
-    std::shared_ptr<Expr> term();
-    std::shared_ptr<Expr> factor();
-    std::shared_ptr<Expr> unary();
-    std::shared_ptr<Expr> primary();
+    std::shared_ptr<Condition> parseCondition() {
+        auto left = parseExpression();
+        if (currentToken.type == TokenType::EQUAL || currentToken.type == TokenType::NEQUAL ||
+            currentToken.type == TokenType::LESS || currentToken.type == TokenType::GREATER ||
+            currentToken.type == TokenType::LEQUAL || currentToken.type == TokenType::GEQUAL) {
+            Token op = currentToken;
+            currentToken = tokenizer.next();
+            auto right = parseExpression();
+            return std::make_shared<ConditionMath>(left->get<std::shared_ptr<Operator>>(), right->get<std::shared_ptr<Operator>>(), op.type); // создаем объект Condition
+        } else if (currentToken.type == TokenType::AND || currentToken.type == TokenType::XOR || currentToken.type == TokenType::OR) {
+            Token op = currentToken;
+            currentToken = tokenizer.next();
+            auto right = parseCondition();
+            return std::make_shared<ConditionMath>(left->get<std::shared_ptr<Condition>>(), right, op.type); // создаем объект Condition
+        } else {
+            throw std::runtime_error("Expected condition operator.");
+        }
+    }
 
-    // Управление токенами
-    Token advance();
-    Token peek();
-    Token previous();
-    bool match(TokenType type);
-    bool check(TokenType type);
+    std::shared_ptr<Expression> parseExpression() {
+        auto left = parseTerm();  // Начинаем с терма
+        while (currentToken.type == TokenType::PLUS || currentToken.type == TokenType::MINUS) {
+            Token op = currentToken;
+            currentToken = tokenizer.next();
+            auto right = parseTerm();
+            left = std::make_shared<Expression>(std::dynamic_pointer_cast<Operator>(std::make_shared<OperatorMath>(left->get<std::shared_ptr<Operator>>(), right->get<std::shared_ptr<Operator>>(), op.type)));
+        }
+        return left;
+    }
+
+    std::shared_ptr<Expression> parseTerm() {
+        auto left = parseFactor();  // Начинаем с фактора
+        while (currentToken.type == TokenType::STAR || currentToken.type == TokenType::SLASH || currentToken.type == TokenType::MOD) {
+            Token op = currentToken;
+            currentToken = tokenizer.next();
+            auto right = parseFactor();
+            left = std::make_shared<Expression>(std::dynamic_pointer_cast<Operator>(std::make_shared<OperatorMath>(left->get<std::shared_ptr<Operator>>(), right->get<std::shared_ptr<Operator>>(), op.type)));  // Создаем оператор для умножения/деления
+        }
+        return left;
+    }
+
+    std::shared_ptr<Expression> parseFactor() {
+        if (currentToken.type == TokenType::NUMBER) {
+            int value = std::stoi(currentToken.value);
+            currentToken = tokenizer.next();
+            return std::make_shared<Expression>(std::make_shared<OperatorObject>(std::make_shared<Object>(ObjectTypes::INT32, value)));
+        }
+        if (currentToken.type == TokenType::STRING) {
+            std::string value = currentToken.value;
+            currentToken = tokenizer.next();
+            return std::make_shared<Expression>(std::make_shared<OperatorIdentifier>(value));
+        }
+        if (currentToken.type == TokenType::TRUE || currentToken.type == TokenType::FALSE) {
+            bool value = currentToken.type == TokenType::TRUE;
+            currentToken = tokenizer.next();
+            return std::make_shared<Expression>(std::make_shared<ConditionObject>(std::make_shared<Object>(ObjectTypes::BOOL, value)));
+        }
+        if (currentToken.type == TokenType::IDENTIFIER) {
+            std::string identifier = currentToken.value;
+            currentToken = tokenizer.next();
+            return std::make_shared<Expression>(identifier);  // Пример для идентификатора
+        }
+        if (currentToken.type == TokenType::LPAREN) {
+            currentToken = tokenizer.next();
+            auto expr = parseExpression();  // Рекурсивно разбираем выражение в скобках
+            if (currentToken.type != TokenType::RPAREN) {
+                throw std::runtime_error("Expected closing parenthesis.");
+            }
+            currentToken = tokenizer.next();
+            return expr;
+        }
+        throw std::runtime_error("Unexpected token.");
+    }
 
     Tokenizer tokenizer;
     Token currentToken;
-    Token previousToken;
 };
-
-MathParser::MathParser(Tokenizer tokenizer)
-    : tokenizer(std::move(tokenizer)) {
-    advance(); // Инициализируем currentToken
-}
-
-Token MathParser::advance() {
-    previousToken = currentToken;
-    currentToken = tokenizer.next();
-    return previousToken;
-}
-
-Token MathParser::peek() {
-    return currentToken;
-}
-
-Token MathParser::previous() {
-    return previousToken;
-}
-
-bool MathParser::check(TokenType type) {
-    return currentToken.type == type;
-}
-
-bool MathParser::match(TokenType type) {
-    if (check(type)) {
-        advance();
-        return true;
-    }
-    return false;
-}
-
-// Парсинг выражения, начиная с логического ИЛИ
-std::shared_ptr<Expr> MathParser::parse() {
-    return expression();
-}
-
-std::shared_ptr<Expr> MathParser::expression() {
-    return logical_or();
-}
-
-std::shared_ptr<Expr> MathParser::logical_or() {
-    std::shared_ptr<Expr> expr = logical_and();
-
-    while (match(TokenType::OR)) {
-        Token op = previous();
-        std::shared_ptr<Expr> right = logical_and();
-        expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
-    }
-
-    return expr;
-}
-
-std::shared_ptr<Expr> MathParser::logical_and() {
-    std::shared_ptr<Expr> expr = equality();
-
-    while (match(TokenType::AND)) {
-        Token op = previous();
-        std::shared_ptr<Expr> right = equality();
-        expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
-    }
-
-    return expr;
-}
-
-std::shared_ptr<Expr> MathParser::equality() {
-    std::shared_ptr<Expr> expr = comparison();
-
-    while (match(TokenType::EQUAL) || match(TokenType::NEQUAL)) {
-        Token op = previous();
-        std::shared_ptr<Expr> right = comparison();
-        expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
-    }
-
-    return expr;
-}
-
-std::shared_ptr<Expr> MathParser::comparison() {
-    std::shared_ptr<Expr> expr = term();
-
-    while (match(TokenType::LESS) || match(TokenType::LEQUAL) ||
-           match(TokenType::GREATER) || match(TokenType::GEQUAL)) {
-        Token op = previous();
-        std::shared_ptr<Expr> right = term();
-        expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
-    }
-
-    return expr;
-}
-
-std::shared_ptr<Expr> MathParser::term() {
-    std::shared_ptr<Expr> expr = factor();
-
-    while (match(TokenType::PLUS) || match(TokenType::MINUS)) {
-        Token op = previous();
-        std::shared_ptr<Expr> right = factor();
-        expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
-    }
-
-    return expr;
-}
-
-std::shared_ptr<Expr> MathParser::factor() {
-    std::shared_ptr<Expr> expr = unary();
-
-    while (match(TokenType::STAR) || match(TokenType::SLASH) || match(TokenType::MOD)) {
-        Token op = previous();
-        std::shared_ptr<Expr> right = unary();
-        expr = std::make_unique<BinaryExpr>(std::move(expr), op, std::move(right));
-    }
-
-    return expr;
-}
-
-std::shared_ptr<Expr> MathParser::unary() {
-    if (match(TokenType::NOT) || match(TokenType::MINUS)) {
-        Token op = previous();
-        std::shared_ptr<Expr> right = unary();
-        return std::make_unique<UnaryExpr>(op, std::move(right));
-    }
-    return primary();
-}
-
-std::shared_ptr<Expr> MathParser::primary() {
-    if (match(TokenType::NUMBER) || match(TokenType::STRING)) {
-        return std::make_unique<LiteralExpr>(previous());
-    }
-
-    if (match(TokenType::IDENTIFIER)) {
-        return std::make_unique<VariableExpr>(previous());
-    }
-
-    if (match(TokenType::LPAREN)) {
-        std::shared_ptr<Expr> expr = expression();
-        if (!match(TokenType::RPAREN)) {
-            throw std::runtime_error("Expected ')'.");
-        }
-        return expr;
-    }
-
-    throw std::runtime_error("Expected expression.");
-}

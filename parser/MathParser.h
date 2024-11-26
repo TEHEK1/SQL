@@ -1,75 +1,60 @@
-#pragma once
-#include <map>
+#ifndef MATHPARSER_HPP
+#define MATHPARSER_HPP
+
 #include <memory>
-#include <vector>
-#include <Tokenizer.h>
-#include <Condition.hpp>
+#include <string>
+#include <stdexcept>
+#include <variant>
+#include "Tokenizer.h"
+#include "Condition.hpp"
+#include "ConditionMath.hpp"
+#include "ConditionObject.hpp"
+#include "Operator.hpp"
+#include "OperatorIdentifier.hpp"
+#include "OperatorMath.hpp"
+#include "OperatorObject.hpp"
+#include "Object.hpp"
+#include "ObjectTypes.hpp"
 
-// Узел бинарного выражения
-class BinaryExpr : public Condition {
-public:
-    BinaryExpr(std::shared_ptr<Condition> left, Token op, std::shared_ptr<Condition> right)
-        : left(std::move(left)), op(op), right(std::move(right)) {}
+// Класс для обертки Condition и Operator в одном объекте
+struct Expression {
+    std::shared_ptr<Condition> my_condition = nullptr;
+    std::shared_ptr<Operator> my_operator = nullptr;
 
-    std::shared_ptr<Condition> left;
-    Token op;
-    std::shared_ptr<Condition> right;
+    explicit Expression(const std::shared_ptr<Condition> &_my_condition) : my_condition(_my_condition) {};
+    explicit Expression(const std::shared_ptr<Operator> &_my_operator) : my_operator(_my_operator) {};
+    explicit Expression(const std::string &identifier) :
+        my_condition(std::make_shared<ConditionObject>(std::make_shared<Object>(ObjectTypes::BOOL, identifier == "true"))),
+        my_operator(std::make_shared<OperatorIdentifier>(identifier))
+    {};
+
+    template<class T>
+    T get() {
+        if constexpr (std::is_same_v<T, std::shared_ptr<Condition>>) {
+            return my_condition;
+        } else if constexpr (std::is_same_v<T, std::shared_ptr<Operator>>) {
+            return my_operator;
+        }
+        throw std::runtime_error("Unexpected type in Expression getter");
+    }
 };
 
-// Узел унарного выражения
-class UnaryExpr : public Condition {
-public:
-    UnaryExpr(Token op, std::shared_ptr<Condition> right)
-        : op(op), right(std::move(right)) {}
-
-    Token op;
-    std::shared_ptr<Condition> right;
-};
-
-// Узел литерала (числа, строки)
-class LiteralExpr : public Condition {
-public:
-    LiteralExpr(Token value) : value(value) {}
-
-    Token value;
-};
-
-// Узел переменной (идентификатора)
-class VariableExpr : public Condition {
-public:
-    VariableExpr(Token name) : name(name) {}
-
-    Token name;
-};
-
-// Класс парсера
+// Основной парсер для математики и условий
 class MathParser {
 public:
     explicit MathParser(Tokenizer tokenizer);
 
-    // Начало парсинга выражения
     std::shared_ptr<Condition> parse();
 
 private:
-    // Функции парсинга
-    std::shared_ptr<Condition> expression();
-    std::shared_ptr<Condition> logical_or();
-    std::shared_ptr<Condition> logical_and();
-    std::shared_ptr<Condition> equality();
-    std::shared_ptr<Condition> comparison();
-    std::shared_ptr<Condition> term();
-    std::shared_ptr<Condition> factor();
-    std::shared_ptr<Condition> unary();
-    std::shared_ptr<Condition> primary();
-
-    // Управление токенами
-    Token advance();
-    Token peek();
-    Token previous();
-    bool match(TokenType type);
-    bool check(TokenType type);
+    std::shared_ptr<Condition> parseCondition();
+    std::shared_ptr<Expression> parseExpression();  // Используем Expression для обработки как Condition, так и Operator
+    std::shared_ptr<Operator> parseOperator();
+    std::shared_ptr<Operator> parseTerm();
+    std::shared_ptr<Operator> parseFactor();
 
     Tokenizer tokenizer;
     Token currentToken;
-    Token previousToken;
 };
+
+#endif // MATHPARSER_HPP
