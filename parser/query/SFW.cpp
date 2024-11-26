@@ -33,8 +33,8 @@ bool SFW::executeQuery(const std::shared_ptr<DataBase> & dataBase) const {
             std::cout << std::endl;
         }
     }
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
+    std::cout << "---------------------------------------------------------------" << std::endl;
+
+
     return true;
 }
