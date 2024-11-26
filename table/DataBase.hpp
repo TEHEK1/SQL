@@ -5,7 +5,7 @@
 
 class DataBase {
     public:
-        bool insertTable(const std::string& tableName, const std::shared_ptr<Table>&);
+        bool insertTable(const std::string& tableName, const std::shared_ptr<Table>& Information);
         std::shared_ptr<Table> getTable(const std::string& tableName) const;
     private:
         std::unordered_map<std::string, std::shared_ptr<Table> > tables;
