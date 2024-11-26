@@ -1,11 +1,11 @@
 #pragma once
 #include <string>
-#include <Relation.hpp>
-#include <JoinEqual.hpp>
-#include <JoinEqualList.hpp>
-#include <SeList.hpp>
-#include <query/SFW.hpp>
-#include <query/DeleteFrom.hpp>
+#include "Relation.hpp"
+#include "JoinEqual.hpp"
+#include "JoinEqualList.hpp"
+#include "SeList.hpp"
+#include "query/SFW.hpp"
+#include "query/DeleteFrom.hpp"
 #include "DataBase.hpp"
 #include "Tokenizer.h"
 #include "Condition.hpp"

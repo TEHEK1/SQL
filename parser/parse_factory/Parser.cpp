@@ -7,7 +7,7 @@
 #include "SeList.hpp"
 #include "OperatorIdentifier.hpp"
 #include "RelationTable.hpp"
-#include "MathParser.h"
+#include "parse_factory/MathParser.h"
 
 
 Parser::Parser(Tokenizer &tokenizer) : tokenizer(tokenizer) {}
