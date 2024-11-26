@@ -21,7 +21,7 @@ target_include_directories(sql PUBLIC
         ${CMAKE_SOURCE_DIR}/table)
 
 
-file(GLOB TESTS ${CMAKE_SOURCE_DIR}/tests/*.*)
+file(GLOB TESTS ${CMAKE_SOURCE_DIR}/tests/*.* ${CMAKE_SOURCE_DIR}/tests/tableTest/*.*)
 
 
 include(FetchContent)

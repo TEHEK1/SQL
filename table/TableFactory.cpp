@@ -98,51 +98,75 @@ bool TableFactory::updateByUpdateList(const std::shared_ptr<Table>& table, Table
 
 std::shared_ptr<Table> TableFactory::filter_equal(const std::string& name,
         const std::shared_ptr<Object>& equal_object, const std::shared_ptr<Table>& table) {
+    
+    auto tableMeta = table->getTableMeta();
 
     std::shared_ptr<Table> resultTableMeta = std::make_shared<Table>(table -> getTableMeta());
     for(const auto& row:table -> getRows()) {
         std::shared_ptr<Object> v = ObjectFactory::getObjectByColumnName(name, row, table -> getTableMeta());
         if(v == equal_object) {
             resultTableMeta -> insertRow(row);
+            for(long long columnNum = 0; columnNum < tableMeta.size(); columnNum ++) {
+                auto column = tableMeta.getByNumber(columnNum);
+                column->updateInsert(row -> getField(columnNum), row);
+            }
         }
     }
     return resultTableMeta;
 }
 
-static std::shared_ptr<Table> filter_less(const std::string& name, 
+std::shared_ptr<Table> TableFactory::filter_less(const std::string& name, 
     const std::shared_ptr<Object>& equal_object, const std::shared_ptr<Table>& table) {
     
+    auto tableMeta = table->getTableMeta();
+
     std::shared_ptr<Table> resultTableMeta = std::make_shared<Table>(table -> getTableMeta());
     for(const auto& row:table -> getRows()) {
         std::shared_ptr<Object> v = ObjectFactory::getObjectByColumnName(name, row, table -> getTableMeta());
         if(v < equal_object) {
             resultTableMeta -> insertRow(row);
+            for(long long columnNum = 0; columnNum < tableMeta.size(); columnNum ++) {
+                auto column = tableMeta.getByNumber(columnNum);
+                column->updateInsert(row -> getField(columnNum), row);
+            }
         }
     }
     return resultTableMeta;
     
 }
 
-static std::shared_ptr<Table> filter_greater(const std::string& name, const std::shared_ptr<Object>& equal_object, const std::shared_ptr<Table>& table) {
+std::shared_ptr<Table> TableFactory::filter_greater(const std::string& name, const std::shared_ptr<Object>& equal_object, const std::shared_ptr<Table>& table) {
+
+    auto tableMeta = table->getTableMeta();
 
     std::shared_ptr<Table> resultTableMeta = std::make_shared<Table>(table -> getTableMeta());
     for(const auto& row:table -> getRows()) {
         std::shared_ptr<Object> v = ObjectFactory::getObjectByColumnName(name, row, table -> getTableMeta());
         if(v > equal_object) {
             resultTableMeta -> insertRow(row);
+            for(long long columnNum = 0; columnNum < tableMeta.size(); columnNum ++) {
+                auto column = tableMeta.getByNumber(columnNum);
+                column->updateInsert(row -> getField(columnNum), row);
+            }
         }
     }
     return resultTableMeta;
 }
 
-static std::shared_ptr<Table> filter_range(const std::string& name, const std::shared_ptr<Object>& less, 
+std::shared_ptr<Table> TableFactory::filter_range(const std::string& name, const std::shared_ptr<Object>& less, 
     const std::shared_ptr<Object>& greater, const std::shared_ptr<Table>& table) {
 
+    auto tableMeta = table->getTableMeta();
+    
     std::shared_ptr<Table> resultTableMeta = std::make_shared<Table>(table -> getTableMeta());
     for(const auto& row:table -> getRows()) {
         std::shared_ptr<Object> v = ObjectFactory::getObjectByColumnName(name, row, table -> getTableMeta());
         if(v >= less && v <= greater) {
             resultTableMeta -> insertRow(row);
+            for(long long columnNum = 0; columnNum < tableMeta.size(); columnNum ++) {
+                auto column = tableMeta.getByNumber(columnNum);
+                column->updateInsert(row -> getField(columnNum), row);
+            }
         }
     }
     return resultTableMeta;
