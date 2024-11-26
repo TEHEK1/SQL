@@ -13,7 +13,8 @@ public:
     [[nodiscard]] std::vector<std::shared_ptr<Row> >  getRows() const &&;
 
     [[nodiscard]] const std::vector<std::shared_ptr<Row> > & getRows() const &;
-     TableMeta getTableMeta() const;
+    TableMeta getTableMeta() const;
+    TableMeta& getTableMeta();
     bool insertRow(const std::shared_ptr<Row>& );
 private:
     friend class TableFactory;

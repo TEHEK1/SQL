@@ -5,6 +5,6 @@
 
 class InsertList { // Можно отнаследовать два разных, но посыл такой
     InsertList(std::vector<Object>&);
-    InsertList(const UpdateEqualList&);
+    InsertList(const UpdateList&);
     bool execute(Table&);
 };

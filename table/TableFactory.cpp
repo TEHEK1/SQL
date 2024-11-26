@@ -27,6 +27,7 @@ std::shared_ptr<Table> TableFactory::joinTables(const std::shared_ptr<Table>& ta
             result->insertRow(current_row);
         }
     }
+    return result;
 }
 
 bool TableFactory::insertRow(InsertOperatorList insertOperatorList, const std::shared_ptr<Table> & table) {
@@ -79,10 +80,25 @@ bool TableFactory::deleteByCondition(const std::shared_ptr<Table>& table, const 
     }
     return true;
 }
+bool TableFactory::updateByUpdateList(const std::shared_ptr<Table>& table, TableMeta& tableMeta, const UpdateList& updateList) {
+    for( const auto& row : table->getRows()) {
+        for(const auto& [columnName, operatorValue] : updateList) {
+            auto columnMeta = tableMeta.getByName(columnName);
+            if (!columnMeta->canUpdate(row->getField(columnMeta->getRealColumnNum()), operatorValue->getObjectOperator(row, tableMeta))) {
+                return false;
+            }
+        }
+        for(const auto& [columnName, operatorValue] : updateList) {
+            auto columnMeta = tableMeta.getByName(columnName);
+            columnMeta->updateUpdate(row->getField(columnMeta->getRealColumnNum()), operatorValue->getObjectOperator(row, tableMeta), row);
+            row->fields[columnMeta->getRealColumnNum()] = operatorValue->getObjectOperator(row, tableMeta);
+        }
+    }
+}
 
-std::shared_ptr<Table> TableFactory::filter_equal(const std::string& name, 
+std::shared_ptr<Table> TableFactory::filter_equal(const std::string& name,
         const std::shared_ptr<Object>& equal_object, const std::shared_ptr<Table>& table) {
-    
+
     std::shared_ptr<Table> resultTableMeta = std::make_shared<Table>(table -> getTableMeta());
     for(const auto& row:table -> getRows()) {
         std::shared_ptr<Object> v = ObjectFactory::getObjectByColumnName(name, row, table -> columnMetas);

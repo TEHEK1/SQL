@@ -13,6 +13,9 @@
 TableMeta Table::getTableMeta() const {
     return columnMetas;
 }
+TableMeta &Table::getTableMeta() {
+    return columnMetas;
+}
 
 bool Table::insertRow(const std::shared_ptr<Row>& row) { 
     rows.push_back(row);
@@ -20,3 +23,5 @@ bool Table::insertRow(const std::shared_ptr<Row>& row) {
 }
 
 Table::Table(const TableMeta& meta) : columnMetas(meta){}
+
+

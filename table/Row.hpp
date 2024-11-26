@@ -10,5 +10,6 @@ class Row {
         std::vector<std::shared_ptr<Object>> getFields() const;
         std::shared_ptr<Object> getField(long long index);
     private:
+        friend class TableFactory;
         std::vector<std::shared_ptr<Object>> fields;
 };

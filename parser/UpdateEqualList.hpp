@@ -1,12 +1,6 @@
 #pragma once
+#include <string>
 #include <vector>
-#include "UpdateEqual.hpp"
+#include "Operator.hpp"
 #include "Table.hpp"
-
-class UpdateEqualList {
-public:
-    UpdateEqualList(const std::vector<UpdateEqual>&);
-    Table execute(Table&);
-    const std::vector<UpdateEqual>& getUpdateEquals() const;
-
-};
+typedef std::vector<std::pair<std::string, std::shared_ptr<Operator> > > UpdateList;

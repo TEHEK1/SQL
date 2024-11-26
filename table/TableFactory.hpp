@@ -3,6 +3,7 @@
 #include "Operator.hpp"
 #include "Table.hpp"
 #include "JoinEqualList.hpp"
+#include "UpdateEqualList.hpp"
 
 class TableFactory {
 public:
@@ -16,5 +17,6 @@ public:
     typedef std::unordered_map<long long, std::shared_ptr<Operator> > InsertOperatorList;
     static bool insertRow(InsertOperatorList, const std::shared_ptr<Table> &);
     static bool deleteByCondition(const std::shared_ptr<Table>& table, const std::shared_ptr<Condition>& condition);
+    static bool updateByUpdateList(const std::shared_ptr<Table>& table, TableMeta& tableMeta, const UpdateList& updateList);
 
 };
