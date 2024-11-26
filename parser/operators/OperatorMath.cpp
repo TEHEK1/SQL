@@ -59,7 +59,6 @@ std::shared_ptr<Object> OperatorMath::getObjectOperator(const std::shared_ptr<Ro
         default:
             throw std::runtime_error("Math operator got not math token");
     }
-    return object1;
 }
 
 ObjectTypes OperatorMath::getTypeOperator(const TableMeta &) const {

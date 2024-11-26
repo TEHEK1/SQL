@@ -7,7 +7,7 @@
 #include <variant>
 #include "Tokenizer.h"
 #include "Condition.hpp"
-#include "ConditionMath.hpp"
+#include "ConditionMathLogical.hpp"
 #include "ConditionObject.hpp"
 #include "Operator.hpp"
 #include "OperatorIdentifier.hpp"
