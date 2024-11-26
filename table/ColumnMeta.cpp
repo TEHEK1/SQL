@@ -15,7 +15,7 @@ std::shared_ptr<Object> ColumnMeta::getNextIncrement() {
     if(type != ObjectTypes::INT32) {
         throw std::runtime_error("wrong type in getNextIncrement");
     }
-    return std::make_shared<Object>(ObjectTypes::INT32, lastValue + 1);
+    return std::make_shared<Object>(ObjectTypes::INT32, static_cast<int32_t>(lastValue + 1));
 }
 
 std::shared_ptr<Object> ColumnMeta::updateNextIncrement() {
@@ -23,7 +23,7 @@ std::shared_ptr<Object> ColumnMeta::updateNextIncrement() {
         throw std::runtime_error("wrong type in updateNextIncrement");
     }
     lastValue += 1;
-    return std::make_shared<Object>(ObjectTypes::INT32, lastValue);
+    return std::make_shared<Object>(ObjectTypes::INT32, static_cast<int32_t>(lastValue));
 }
 
 long long ColumnMeta::getRealColumnNum() const {
