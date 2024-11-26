@@ -4,6 +4,7 @@
 
 #include "MathParser.h"
 #include "Condition.hpp"
+#include "ConditionMathExpression.hpp"
 #include "ConditionMathLogical.hpp"
 #include "ConditionObject.hpp"
 #include "Operator.hpp"
@@ -51,13 +52,16 @@ std::shared_ptr<Condition> MathParser::parseCondition() {
         Token op = currentToken;
         currentToken = tokenizer.next();
         auto right = parseExpression();
-        return std::make_shared<ConditionMathLogical>(left->get<std::shared_ptr<Operator>>(), right->get<std::shared_ptr<Operator>>(), op.type);
+        return std::make_shared<ConditionMathExpression>(left->get<std::shared_ptr<Operator>>(), right->get<std::shared_ptr<Operator>>(), op.type);
     } else if (currentToken.type == TokenType::AND || currentToken.type == TokenType::XOR || currentToken.type == TokenType::OR) {
         Token op = currentToken;
         currentToken = tokenizer.next();
         auto right = parseCondition();
         return std::make_shared<ConditionMathLogical>(left->get<std::shared_ptr<Condition>>(), right, op.type);
-    } else {
+    } else if(currentToken.type == TokenType::END) {
+        return left->get<std::shared_ptr<Condition>>();
+    }
+    else {
         throw std::runtime_error("Expected condition operator.");
     }
 }

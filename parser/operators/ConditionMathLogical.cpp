@@ -1,5 +1,9 @@
 #include "ConditionMathLogical.hpp"
 
+ConditionMathLogical::ConditionMathLogical(const std::shared_ptr<Condition> & operator1,
+        const std::shared_ptr<Condition> & operator2, TokenType tokenType) : m_condition1(operator1), m_condition2(operator2), m_tokenType(tokenType) {}
+
+
 std::shared_ptr<Table> ConditionMathLogical::getTableCondition(const std::shared_ptr<Table> & table) const {
     return getTableConditionLinear(table);
 }

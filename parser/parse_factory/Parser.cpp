@@ -16,7 +16,7 @@
 
 #include "Attributes.hpp"
 
-Parser::Parser(Tokenizer &tokenizer) : tokenizer(tokenizer) {}
+Parser::Parser(const Tokenizer &tokenizer) : tokenizer(tokenizer) {}
 
 std::shared_ptr<SeList> Parser::parse_selist() {
     Token next_token = tokenizer.next();
