@@ -9,3 +9,7 @@
 {
     return rows;
 }
+
+TableMeta Table::getTableMeta() const {
+    return columnMetas;
+}

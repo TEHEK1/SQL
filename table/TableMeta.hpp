@@ -12,5 +12,4 @@ private:
     std::unordered_map<std::string, long long > m_stringToLongColumnMetas;
     std::unordered_map<std::string, std::shared_ptr<ColumnMeta> > m_stringColumnMetas;
     std::unordered_map<long long, std::shared_ptr<ColumnMeta> > m_longColumnMetas;
-    size_t row_count = 0;
 };

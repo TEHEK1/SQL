@@ -17,12 +17,14 @@ std::shared_ptr<ColumnMeta> TableMeta::getByNumber(long long columnIndex) const 
     return tableMeta -> second;
 }
 
-// bool TableMeta::setByName(const std::string& name, const std::shared_ptr<ColumnMeta>& inforrmation) {
-//     if ()
-// }
+bool TableMeta::setByName(const std::string& name, const std::shared_ptr<ColumnMeta>& inforrmation) {
+    m_stringColumnMetas[name] = inforrmation;
+    m_longColumnMetas[inforrmation -> getRealColumnNum()] = inforrmation;
+    m_stringToLongColumnMetas[name] = inforrmation -> getRealColumnNum();
+}
 
 size_t TableMeta::size() const {
-    return row_count;
+    return m_longColumnMetas.size();
 }
 
 std::unordered_map<std::string, std::shared_ptr<ColumnMeta> > TableMeta::getNameColumnMetas() const {
